@@ -1,11 +1,29 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import DashboardPage from './pages/Dashboard';
+import FinancePage from './pages/Finance';
+import ProductivityPage from './pages/Productivity';
+import GoalsPage from './pages/Goals';
+import ProfilePage from './pages/Profile';
+import NotificationPage from './pages/Notification';
+
+
+
 function App() {
   return (
-    <div className="bg-slate-900 h-screen flex justify-center items-center">
-      <h1 className="text-3xl font-bold text-sky-400 underline">
-        Mantap! Tailwind udah jalan, cuy!
-      </h1>
-    </div>
-  )
+    <Router>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/productivity" element={<ProductivityPage />}></Route>
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/goals" element={<GoalsPage />}></Route>
+          <Route path="/profile" element={<ProfilePage />}></Route>
+          <Route path="/notifications" element={<NotificationPage />}></Route>
+        </Routes>
+      </MainLayout>
+    </Router>
+  );
 }
 
-export default App
+export default App;
