@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom'; // Import ini
+import { NavLink } from 'react-router-dom';
+import LogoImg from '../assets/Logo.png';
+
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -11,7 +13,7 @@ import {
 const Sidebar = () => {
   
   const menuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard ' },
     { name: 'Productivity', icon: Calendar, path: '/productivity' },
     { name: 'Finance', icon: DollarSign, path: '/finance' },
     { name: 'Goals', icon: Target, path: '/goals' },
@@ -23,7 +25,7 @@ const Sidebar = () => {
     <div className="flex flex-col h-screen w-64 bg-[#121212] text-white p-4 font-sans border-r border-gray-800">
       <div className="flex items-center justify-center py-8 mb-4">
         <h1 className="text-3xl font-bold tracking-tight">
-          Fin<span className="text-[#10b981]">Bits</span>
+          <img src={LogoImg} alt="" width={120} height={120}/>
         </h1>
       </div>
 

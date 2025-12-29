@@ -1,4 +1,3 @@
-// Update DeleteModalHabbits.tsx
 import React from 'react';
 
 interface DeleteModalHabbitsProps {

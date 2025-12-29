@@ -5,27 +5,22 @@ import TopHabbitsCard from "../components/productivity/TopHabbitsCard";
 
 export default function ProductivityPage() {
     return (
-      // Background utama cuma ada di sini
-      <div className="min-h-screen bg-[#121212] text-white p-6 space-y-8 font-sans">
+      <div className="min-h-screen bg-[#121212] text-white p-4 space-y-6 font-sans">
         
-        {/* Section Atas: To Do List */}
         <section className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-emerald-400 mb-6">To Do List</h2>
+          <h2 className="text-xl font-bold text-emerald-400 mb-4">To Do List</h2>
           <TodoApp />
         </section>
   
-        {/* Section Bawah: Habbits Layout (Grid) */}
         <section className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-emerald-400 mb-6">Habbits</h2>
+          <h2 className="text-xl font-bold text-emerald-400 mb-4">Habbits</h2>
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Kolom Kiri: Habbits List (Porsi Lebih Besar) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div className="lg:col-span-8">
               <HabbitsList />
             </div>
   
-            {/* Kolom Kanan: Streak & Top Habits */}
-            <div className="lg:col-span-4 flex flex-col ">
+            <div className="lg:col-span-4 flex flex-col gap-4">
               <StreakCard />
               <TopHabbitsCard />
             </div>
