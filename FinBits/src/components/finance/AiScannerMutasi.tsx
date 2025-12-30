@@ -59,7 +59,6 @@ export const AiScannerMutasi = () => {
         </button>
       </div>
 
-      {/* Analysis Section (Hanya muncul kalau udah upload biar keren) */}
       <div className={`border border-gray-700 rounded-lg p-4 space-y-3 text-[10px] leading-relaxed text-gray-300 transition-opacity ${image ? 'opacity-100' : 'opacity-50'}`}>
         <section>
           <p className="font-bold text-white flex items-center gap-1">

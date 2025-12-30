@@ -1,5 +1,5 @@
 import FinanceCard from "../../ui/FinanceCard";
-import GoalsCard from "../../ui/GoalsCard";
+import GoalsCard from "../../ui/GoalsCardDashboard";
 import HabitCard from "../../ui/HabitCard";
 import ProductivityCard from "../../ui/ProductivityCard";
 
