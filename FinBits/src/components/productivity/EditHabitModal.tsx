@@ -1,25 +1,37 @@
-// ui/EditHabbitModal.tsx
 import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
-import type { Habbit } from '../../assets/types/habbits.types';
 
-interface EditHabbitModalProps {
-  habbit: Habbit;
-  onClose: () => void;
-  onSave: (updatedHabbit: Habbit) => void;
+// --- 1. DEFINISI INTERFACE (Biar gak merah/error) ---
+interface Habit {
+  id?: string | number;
+  title: string;
+  date: string;
+  frequency: string;
+  category: string;
+  progress: string;
 }
 
-const EditHabbitModal: React.FC<EditHabbitModalProps> = ({ habbit, onClose, onSave }) => {
+interface EditHabitModalProps {
+  habit: Habit;
+  onClose: () => void;
+  onSave: (updatedHabit: Habit) => void;
+}
+
+// --- 2. KOMPONEN UTAMA ---
+const EditHabitModal: React.FC<EditHabitModalProps> = ({ habit, onClose, onSave }) => {
+  // Kalau habit-nya gak ada, return null biar gak crash
+  if (!habit) return null;
+
   const [reminder, setReminder] = useState(false);
   const [showFrequencyDropdown, setShowFrequencyDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   
   const [formData, setFormData] = useState({
-    title: habbit.title,
-    date: habbit.date,
-    frequency: habbit.frequency,
-    category: habbit.category,
-    progress: habbit.progress,
+    title: habit.title || '', // Kasih fallback string kosong
+    date: habit.date || '',
+    frequency: habit.frequency || '-',
+    category: habit.category || '-',
+    progress: habit.progress || '0%',
   });
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -41,11 +53,11 @@ const EditHabbitModal: React.FC<EditHabbitModalProps> = ({ habbit, onClose, onSa
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedHabbit: Habbit = {
-      ...habbit,
+    const updatedHabit: Habit = {
+      ...habit,
       ...formData
     };
-    onSave(updatedHabbit);
+    onSave(updatedHabit);
   };
 
   return (
@@ -65,13 +77,13 @@ const EditHabbitModal: React.FC<EditHabbitModalProps> = ({ habbit, onClose, onSa
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-[#1EB980] text-center mb-10">
-          Edit Habbit
+          Edit Habit
         </h1>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Input: Habbit Title */}
+          {/* Input: Habit Title */}
           <div className="space-y-2">
-            <label className="block text-white font-semibold">Habbit Title</label>
+            <label className="block text-white font-semibold">Habit Title</label>
             <input 
               type="text" 
               name="title"
@@ -237,7 +249,7 @@ const EditHabbitModal: React.FC<EditHabbitModalProps> = ({ habbit, onClose, onSa
               type="submit"
               className="border border-emerald-500 text-emerald-400 px-6 py-3 rounded-lg hover:bg-emerald-900/20 transition-all"
             >
-              Update Habbit
+              Update Habit
             </button>
           </div>
         </form>
@@ -246,4 +258,4 @@ const EditHabbitModal: React.FC<EditHabbitModalProps> = ({ habbit, onClose, onSa
   );
 };
 
-export default EditHabbitModal;
+export default EditHabitModal;

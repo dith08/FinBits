@@ -32,7 +32,7 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) { 
         alert('File terlalu besar. Maksimal 5MB.');
         return;
       }

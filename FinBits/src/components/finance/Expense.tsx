@@ -1,7 +1,8 @@
 // Update ExpenseCard.tsx
 import React, { useState } from 'react';
-import AddExpense from './AddExpanse';
-import DetailExpanse from './DetailExpanse';
+import AddExpense from './AddExpense';
+import DetailExpense from './DetailExpense';
+
 
 interface ExpenseItem {
   label: string;
@@ -87,7 +88,7 @@ export const ExpenseCard: React.FC = () => {
 
       {/* Detail Expense Modal */}
       {showDetailModal && (
-        <DetailExpanse
+        <DetailExpense
           onClose={() => setShowDetailModal(false)}
           expenseItems={expenseData}
           onUpdateItems={handleUpdateItems}

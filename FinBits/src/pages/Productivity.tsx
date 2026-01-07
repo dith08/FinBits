@@ -1,7 +1,7 @@
 import HabbitsList from "../components/productivity/HabitList";
 import StreakCard from "../components/productivity/StreakCard";
 import TodoApp from "../components/productivity/ToDoList";
-import TopHabbitsCard from "../components/productivity/TopHabbitsCard";
+import TopHabbitsCard from "../components/productivity/TopHabitsCard";
 
 export default function ProductivityPage() {
     return (

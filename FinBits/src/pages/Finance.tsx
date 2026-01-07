@@ -1,8 +1,9 @@
 import { AiScannerMutasi } from "../components/finance/AiScannerMutasi";
 import { BudgetAssistant } from "../components/finance/BudgetAssistant";
-import { ExpenseCard } from "../components/finance/Expanse";
+import ExpenseCard from "../components/finance/Expense";
 import IncomeCard from "../components/finance/Income";
-import { Tabungan } from "../components/finance/Tabungan";
+import Tabungan from "../components/finance/Savings";
+
 import { TargetWants } from "../components/finance/TargetWants";
 
 export default function FinancePage() {

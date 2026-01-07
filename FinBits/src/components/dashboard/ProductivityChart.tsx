@@ -1,4 +1,3 @@
-// ProductivityChart.tsx - UPDATED DATA SERIES
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const data = [

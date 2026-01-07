@@ -1,4 +1,3 @@
-import React from 'react';
 
 const goalsData = [
   { id: 1, title: 'Bangun Pagi Setiap Hari Jam 4.00', progress: 25, deadline: '7 Januari 2026' },

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { ChevronDown, Sparkles, Edit, Trash2, Check } from 'lucide-react';
-import AddHabbitModal from './AddHabbitsModal';
-import AddHabbitAI from './AddHabbitsAiModal';
-import EditHabbitModal from './EditHabbitsModal';
-import DeleteModalHabbits from './DeleteModalHabbits';
+import AddHabitModal from './AddHabitModal';
+
+import EditHabitModal from './EditHabitModal';
+import DeleteHabitModal from './DeleteHabitModal';
+import AddHabbitAI from './AddHabitAiModal';
 
 
-interface Habbit {
+interface Habit {
   id: number;
   title: string;
   date: string;
@@ -18,8 +19,8 @@ interface Habbit {
   isSelected: boolean;
 }
 
-const HabbitsList = () => {
-  const [habbits, setHabbits] = useState<Habbit[]>([
+const HabitsList = () => {
+  const [habits, setHabits] = useState<Habit[]>([
     { 
       id: 1, 
       title: 'Bangun pagi jam 04.00', 
@@ -71,28 +72,28 @@ const HabbitsList = () => {
   const [showAIModal, setShowAIModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedHabbit, setSelectedHabbit] = useState<Habbit | null>(null);
+  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [actionMode, setActionMode] = useState<'none' | 'edit' | 'delete'>('none');
 
   const toggleOpen = (id: number) => {
     if (actionMode === 'none') {
-      setHabbits(habbits.map(h => h.id === id ? { ...h, isOpen: !h.isOpen } : h));
+      setHabits(habits.map(h => h.id === id ? { ...h, isOpen: !h.isOpen } : h));
     }
   };
 
   const toggleCheck = (id: number) => {
     if (actionMode === 'none') {
-      setHabbits(habbits.map(h => h.id === id ? { ...h, completed: !h.completed } : h));
+      setHabits(habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h));
     }
   };
 
   const handleActionClick = (mode: 'edit' | 'delete') => {
     if (actionMode === mode) {
-      // Jika sudah dalam mode yang sama, cari habbit yang dipilih
-      const selectedHabbit = habbits.find(habbit => habbit.isSelected);
+      // Jika sudah dalam mode yang sama, cari habit yang dipilih
+      const selectedHabit = habits.find(habit => habit.isSelected);
       
-      if (selectedHabbit) {
-        setSelectedHabbit(selectedHabbit);
+      if (selectedHabit) {
+        setSelectedHabit(selectedHabit);
         if (mode === 'edit') {
           setShowEditModal(true);
         } else {
@@ -107,14 +108,14 @@ const HabbitsList = () => {
       // Masuk ke mode baru
       setActionMode(mode);
       // Reset semua seleksi sebelumnya
-      setHabbits(habbits.map(h => ({ ...h, isSelected: false })));
+      setHabits(habits.map(h => ({ ...h, isSelected: false })));
     }
   };
 
-  const handleSelectHabbit = (id: number) => {
+  const handleSelectHabit = (id: number) => {
     if (actionMode !== 'none') {
-      // Hanya pilih 1 habbit, unselect yang lain
-      setHabbits(habbits.map(h => ({
+      // Hanya pilih 1 habit, unselect yang lain
+      setHabits(habits.map(h => ({
         ...h,
         isSelected: h.id === id ? !h.isSelected : false
       })));
@@ -123,27 +124,27 @@ const HabbitsList = () => {
 
   const exitActionMode = () => {
     setActionMode('none');
-    setHabbits(habbits.map(h => ({ ...h, isSelected: false })));
+    setHabits(habits.map(h => ({ ...h, isSelected: false })));
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedHabbit) {
-      // Hapus habbit dari state
-      setHabbits(habbits.filter(h => h.id !== selectedHabbit.id));
+    if (selectedHabit) {
+      // Hapus habit dari state
+      setHabits(habits.filter(h => h.id !== selectedHabit.id));
       setShowDeleteModal(false);
-      setSelectedHabbit(null);
+      setSelectedHabit(null);
     }
   };
 
-  const handleEditSave = (updatedHabbit: Habbit) => {
-    // Update habbit di state
-    setHabbits(habbits.map(h => h.id === updatedHabbit.id ? updatedHabbit : h));
+  const handleEditSave = (updatedHabit: Habit) => {
+    // Update habit di state
+    setHabits(habits.map(h => h.id === updatedHabit.id ? updatedHabit : h));
     setShowEditModal(false);
-    setSelectedHabbit(null);
+    setSelectedHabit(null);
   };
 
-  // Cari habbit yang dipilih
-  const selectedHabbitForAction = habbits.find(habbit => habbit.isSelected);
+  // Cari habit yang dipilih
+  const selectedHabitForAction = habits.find(habit => habit.isSelected);
 
   return (
     <div className="text-white p-8 font-sans">
@@ -165,9 +166,9 @@ const HabbitsList = () => {
                 {actionMode === 'edit' 
                   ? 'Pilih 1 habbit yang akan diedit' 
                   : 'Pilih 1 habbit yang akan dihapus'}
-                {selectedHabbitForAction && (
+                {selectedHabitForAction && (
                   <span className="ml-2 text-emerald-400">
-                    • {selectedHabbitForAction.title}
+                    • {selectedHabitForAction.title}
                   </span>
                 )}
               </span>
@@ -187,7 +188,7 @@ const HabbitsList = () => {
         </h1>
 
         {/* Habbits Items */}
-        {habbits.map((habbit) => (
+        {habits.map((habbit) => (
           <div key={habbit.id} className="space-y-2">
             <div className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${
               habbit.isSelected 
@@ -200,7 +201,7 @@ const HabbitsList = () => {
                 {/* Radio button untuk seleksi */}
                 {actionMode !== 'none' && (
                   <button
-                    onClick={() => handleSelectHabbit(habbit.id)}
+                    onClick={() => handleSelectHabit(habbit.id)}
                     className={`w-5 h-5 border rounded-full flex items-center justify-center transition-colors ${
                       habbit.isSelected 
                         ? actionMode === 'edit'
@@ -300,7 +301,7 @@ const HabbitsList = () => {
             }`}
           >
             <Edit className="w-4 h-4" />
-            {actionMode === 'edit' && selectedHabbitForAction
+            {actionMode === 'edit' && selectedHabitForAction
               ? 'Edit Selected'
               : 'Edit Habbits'
             }
@@ -315,7 +316,7 @@ const HabbitsList = () => {
             }`}
           >
             <Trash2 className="w-4 h-4" />
-            {actionMode === 'delete' && selectedHabbitForAction
+            {actionMode === 'delete' && selectedHabitForAction
               ? 'Delete Selected'
               : 'Delete Habbits'
             }
@@ -325,7 +326,7 @@ const HabbitsList = () => {
 
       {/* Modal untuk Add Habbits */}
       {showAddModal && (
-        <AddHabbitModal onClose={() => setShowAddModal(false)} />
+        <AddHabitModal onClose={() => setShowAddModal(false)} />
       )}
 
       {/* Modal untuk Add Habbits dengan AI */}
@@ -334,24 +335,24 @@ const HabbitsList = () => {
       )}
 
       {/* Modal untuk Edit Habbit */}
-      {showEditModal && selectedHabbit && (
-        <EditHabbitModal 
-          habbit={selectedHabbit}
+     {showEditModal && selectedHabit && (
+        <EditHabitModal 
+          habit={selectedHabit} 
           onClose={() => {
             setShowEditModal(false);
-            setSelectedHabbit(null);
-          }}
+            setSelectedHabit(null);
+          }} 
           onSave={handleEditSave}
         />
       )}
 
       {/* Modal untuk Delete Confirmation */}
       {showDeleteModal && (
-        <DeleteModalHabbits
+        <DeleteHabitModal
           isOpen={showDeleteModal}
           onClose={() => {
             setShowDeleteModal(false);
-            setSelectedHabbit(null);
+            setSelectedHabit(null);
           }}
           onConfirm={handleDeleteConfirm}
         />
@@ -360,4 +361,4 @@ const HabbitsList = () => {
   );
 };
 
-export default HabbitsList;
+export default HabitsList;

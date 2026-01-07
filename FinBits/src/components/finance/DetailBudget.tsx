@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { PencilLine, Trash2, X, Edit } from 'lucide-react';
 import EditBudget from './EditBudget';
-import EditWants from './EditWants'; // Import EditWants
+import EditWants from './EditWants';
 
 interface WantItem {
   id: number;

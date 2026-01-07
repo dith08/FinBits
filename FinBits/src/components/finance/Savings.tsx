@@ -1,7 +1,8 @@
 // components/Tabungan.tsx
 import React, { useState } from 'react';
-import AddTabungan from './AddTabungan';
-import DetailTabungan from './DetailTabungan';
+import AddSavings from './AddSavings';
+import DetailSavings from './DetailSavings';
+
 
 
 interface TabunganItem {
@@ -109,7 +110,7 @@ export const Tabungan: React.FC = () => {
 
       {/* Add Tabungan Modal */}
       {showAddModal && (
-        <AddTabungan 
+        <AddSavings 
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddTabungan}
         />
@@ -117,7 +118,7 @@ export const Tabungan: React.FC = () => {
 
       {/* Detail Tabungan Modal */}
       {showDetailModal && (
-        <DetailTabungan 
+        <DetailSavings 
           onClose={() => setShowDetailModal(false)}
           tabunganItems={tabunganItems}
           currentSaving={currentSaving}

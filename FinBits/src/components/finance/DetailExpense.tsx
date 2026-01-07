@@ -1,7 +1,7 @@
 // ui/DetailExpense.tsx
 import React, { useState } from 'react';
 import { PencilLine, Trash2, X } from 'lucide-react';
-import EditExpense from './EditExpanse';
+import EditExpense from './EditExpense';
 
 
 interface ExpenseItem {

@@ -1,7 +1,7 @@
 // ui/DetailTabungan.tsx
 import React, { useState } from 'react';
 import { PencilLine, Trash2, X, TrendingUp } from 'lucide-react';
-import EditTabungan from './EditTabungan';
+import EditTabungan from './EditSavings';
 
 interface TabunganItem {
   id: number;
@@ -191,7 +191,7 @@ const DetailTabungan: React.FC<DetailTabunganProps> = ({
         <EditTabungan
           onClose={() => {
             setShowEditModal(false);
-            setEditingItem(null);
+            setEditingItem(null); 
           }}
           onSave={handleSaveEdit}
           initialData={editingItem}

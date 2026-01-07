@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, Sparkles, FileText } from "lucide-react";
+import { Camera, Sparkles, } from "lucide-react";
 
 export const AiScannerMutasi = () => {
   const [image, setImage] = useState(null);
