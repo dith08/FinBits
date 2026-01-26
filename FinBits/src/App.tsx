@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
+import { ProtectedRoute } from './components/layout';
 import DashboardPage from './pages/Dashboard';
 import FinancePage from './pages/Finance';
 import ProductivityPage from './pages/Productivity';
@@ -8,17 +10,25 @@ import ProfilePage from './pages/Profile';
 import NotificationPage from './pages/Notification';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
+import GoogleCallback from './pages/GoogleCallback';
+import { setTokenExpiredCallback } from './services/apiInstance';
 
-function App() {
+function AppRoutes() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setTokenExpiredCallback(() => {
+      navigate('/login', { replace: true });
+    });
+  }, [navigate]);
+
   return (
-    <Router>
-      <Routes>
-        {/* --- Public Routes (Gak pake Layout) --- */}
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/auth/callback" element={<GoogleCallback />} />
 
-        {/* --- Protected/Private Routes (Pake MainLayout) --- */}
-        {/* Kita bungkus semua route yang butuh sidebar ke dalam satu Route parent */}
+      <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/productivity" element={<ProductivityPage />} />
@@ -27,10 +37,19 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/notifications" element={<NotificationPage />} />
         </Route>
+      </Route>
 
-        {/* Fallback kalau path gak ketemu, lempar ke login */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 }

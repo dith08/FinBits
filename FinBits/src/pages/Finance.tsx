@@ -8,9 +8,9 @@ import { TargetWants } from "../components/finance/TargetWants";
 
 export default function FinancePage() {
   return (
-    <div className="min-h-screen bg-[#121212] text-white p-6">
+    <div className="min-h-screen bg-[#121212] text-white p-6 pt-20 lg:pt-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#10B981] mb-8">Finance</h1>
+        <h1 className="text-2xl font-bold text-[#10B981] mb-8">Keuangan</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           

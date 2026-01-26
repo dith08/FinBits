@@ -1,8 +1,9 @@
-// Update DetailBudget.tsx
 import React, { useState } from 'react';
-import { PencilLine, Trash2, X, Edit } from 'lucide-react';
+import { PencilLine, Trash2, X, Edit, Target, TrendingUp, Calendar } from 'lucide-react';
 import EditBudget from './EditBudget';
 import EditWants from './EditWants';
+import DeleteWants from './DeleteWants';
+import { ModalPortal } from '../common';
 
 interface WantItem {
   id: number;
@@ -24,7 +25,8 @@ interface DetailBudgetProps {
   currentBudget: number;
   onEditClick: (item: BudgetItem) => void;
   onDelete: (id: number) => void;
-  onEditWant: (name: string, price: number, imageUrl: string) => void; // Update untuk menerima parameter
+  onEditWant: (name: string, price: number, imageUrl: string, imageFile?: File | null) => void;
+  onDeleteWant: (id: number) => Promise<void>;
 }
 
 const DetailBudget: React.FC<DetailBudgetProps> = ({ 
@@ -34,10 +36,12 @@ const DetailBudget: React.FC<DetailBudgetProps> = ({
   currentBudget,
   onEditClick,
   onDelete,
-  onEditWant
+  onEditWant,
+  onDeleteWant
 }) => {
   const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
-  const [showEditWantsModal, setShowEditWantsModal] = useState(false); // State baru untuk edit wants
+  const [showEditWantsModal, setShowEditWantsModal] = useState(false);
+  const [showDeleteWantsModal, setShowDeleteWantsModal] = useState(false);
   const [selectedBudgetItem, setSelectedBudgetItem] = useState<BudgetItem | null>(null);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -75,163 +79,196 @@ const DetailBudget: React.FC<DetailBudgetProps> = ({
   const progress = (currentBudget / wantItem.price) * 100;
 
   return (
-    <>
-      <div 
-        className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-50 overflow-y-auto"
-        onClick={handleBackdropClick}
-      >
-        <div className="bg-[#121212] text-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-800 my-8">
-          
-          {/* Header */}
-          <div className="flex justify-between items-center mb-10">
-            <h1 className="text-[#1db978] text-3xl font-bold">
-              Detail Budget
-            </h1>
-            <button 
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Progress Section */}
-          <div className="mb-8 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-300">Progress Menuju Target:</span>
-              <span className="text-[#1db978] font-bold">{Math.min(100, progress).toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-[#1db978] h-3 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(100, progress)}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-sm text-gray-400 mt-2">
-              <span>{formatIDR(currentBudget)}</span>
-              <span>{formatIDR(wantItem.price)}</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            
-            {/* Kolom Kiri: Info Produk */}
-            <div className="flex flex-col items-center">
-              <div className="relative w-full max-w-xs">
-                <div className="w-full h-64 bg-white rounded-lg overflow-hidden flex items-center justify-center p-4 mb-6">
-                  <img 
-                    src={wantItem.imageUrl}
-                    alt={wantItem.name}
-                    className="object-contain w-full h-full max-h-full"
-                  />
+    <ModalPortal>
+      <>
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
+          onClick={handleBackdropClick}
+        >
+          <div className="w-full max-w-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl shadow-2xl border border-gray-800/50 overflow-hidden my-auto">
+            <div className="bg-gradient-to-r from-emerald-500/20 to-transparent p-6 border-b border-gray-800/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                    <Target className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">Detail Budget</h1>
+                    <p className="text-gray-400 text-sm">Kelola target keinginan Anda</p>
+                  </div>
                 </div>
                 <button 
-                  onClick={handleEditWantsClick} // Panggil fungsi baru
-                  className="absolute top-2 right-2 p-2 bg-blue-900/50 hover:bg-blue-800/70 rounded-lg transition-colors"
-                  title="Edit Product"
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                 >
-                  <Edit size={18} className="text-blue-400" />
+                  <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
-              
-              <div className="text-center space-y-3 w-full">
-                <h2 className="text-xl font-semibold mb-2">{wantItem.name}</h2>
-                <div className="space-y-2 bg-gray-900/30 p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Harga :</span>
-                    <span className="font-bold">{formatIDR(wantItem.price)}</span>
+            </div>
+
+            <div className="p-6">
+              {/* Progress Section */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 rounded-xl">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-300 font-medium text-sm">Progress Menuju Target</span>
+                  <span className="text-emerald-400 font-bold">{Math.min(100, progress).toFixed(1)}%</span>
+                </div>
+                <div className="w-full bg-gray-800/50 rounded-full h-3 p-0.5 border border-gray-700/30 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${Math.min(100, progress)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 mt-2">
+                  <span className="font-mono">{formatIDR(currentBudget)}</span>
+                  <span className="font-mono">{formatIDR(wantItem.price)}</span>
+                </div>
+              </div>
+
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                
+                {/* Left: Product Info */}
+                <div className="flex flex-col">
+                  <div className="relative group mb-4">
+                    <div className="relative w-full bg-white rounded-xl overflow-hidden flex items-center justify-center p-3 shadow-lg">
+                      <img 
+                        src={wantItem.imageUrl}
+                        alt={wantItem.name}
+                        className="object-contain w-full h-full max-h-48 transform group-hover:scale-105 transition duration-300"
+                      />
+                    </div>
+                    <button 
+                      onClick={handleEditWantsClick}
+                      className="absolute top-2 right-2 p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all shadow-lg"
+                      title="Edit Product"
+                    >
+                      <Edit size={16} className="text-white" />
+                    </button>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Budget saat ini:</span>
-                    <span className="font-bold">{formatIDR(currentBudget)}</span>
+                  
+                  <div className="space-y-2">
+                    <div>
+                      <h2 className="text-lg font-bold text-white">{wantItem.name}</h2>
+                      <p className="text-gray-400 text-xs">Target Keinginan</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="bg-white/5 border border-gray-800 p-3 rounded-lg">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400 text-xs">Harga Target</span>
+                          <span className="font-bold text-white text-sm">{formatIDR(wantItem.price)}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/5 border border-gray-800 p-3 rounded-lg">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400 text-xs">Budget Terkumpul</span>
+                          <span className="font-bold text-emerald-400 text-sm">{formatIDR(currentBudget)}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-lg">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300 text-xs font-medium">Sisa Dibutuhkan</span>
+                          <span className="font-bold text-emerald-400 text-sm">
+                            {formatIDR(Math.max(0, wantItem.price - currentBudget))}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Kekurangan:</span>
-                    <span className="font-bold text-[#1db978]">
-                      {formatIDR(Math.max(0, wantItem.price - currentBudget))}
-                    </span>
+                </div>
+
+                {/* Right: Budget History */}
+                <div className="flex flex-col">
+                  <div className="mb-3">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <TrendingUp size={18} className="text-emerald-400" />
+                      Riwayat Budget
+                    </h3>
+                    <p className="text-gray-400 text-xs mt-1">{budgetItems.length} transaksi</p>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 flex-1">
+                    {budgetItems.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-8 text-center border-2 border-dashed border-gray-700 rounded-lg">
+                        <Target size={24} className="text-gray-600 mb-2" />
+                        <p className="text-gray-400 text-xs">Belum ada riwayat budget</p>
+                      </div>
+                    ) : (
+                      budgetItems.map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="group bg-gradient-to-r from-gray-800/40 to-gray-900/40 hover:from-gray-800/60 hover:to-gray-900/60 border border-gray-700/50 hover:border-emerald-500/30 rounded-lg p-3 transition-all"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                <span className="text-emerald-400 font-bold text-xs">
+                                  +{formatIDR(item.amount)}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1 text-gray-400 text-xs">
+                                <Calendar size={10} />
+                                {formatDate(item.date)}
+                              </div>
+                            </div>
+                            
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={() => handleEditBudgetClick(item)}
+                                className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded transition-colors"
+                                title="Edit"
+                              >
+                                <PencilLine size={14} className="text-blue-400" />
+                              </button>
+                              <button 
+                                onClick={() => onDelete(item.id)}
+                                className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded transition-colors"
+                                title="Delete"
+                              >
+                                <Trash2 size={14} className="text-red-400" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Kolom Kanan: List Riwayat */}
-            <div className="flex flex-col">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-300">Riwayat Budget</h3>
-                <span className="text-gray-400 text-sm">
-                  {budgetItems.length} transaksi
-                </span>
-              </div>
-              
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                {budgetItems.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="flex justify-between items-center border border-gray-700 rounded-lg p-4 bg-gray-900/30 hover:bg-gray-800/50 transition-colors group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-[#1db978] font-bold">+ {formatIDR(item.amount)}</span>
-                      <span className="text-gray-400 text-sm">{formatDate(item.date)}</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => handleEditBudgetClick(item)}
-                        className="p-2 bg-blue-900/30 hover:bg-blue-800/40 rounded-lg transition-colors"
-                        title="Edit Budget"
-                      >
-                        <PencilLine size={16} className="text-blue-400" />
-                      </button>
-                      <button 
-                        onClick={() => onDelete(item.id)}
-                        className="p-2 bg-red-900/30 hover:bg-red-800/40 rounded-lg transition-colors"
-                        title="Delete Budget"
-                      >
-                        <Trash2 size={16} className="text-red-400" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              {/* Footer Actions */}
+              <div className="flex gap-3 pt-4 border-t border-gray-800">
+                <button 
+                  onClick={handleEditWantsClick}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-lg"
+                >
+                  <Edit size={16} />
+                  Edit Produk
+                </button>
                 
-                {budgetItems.length === 0 && (
-                  <div className="text-center py-8 text-gray-500 border border-gray-700 rounded-lg">
-                    Belum ada riwayat budget. Tambahkan budget pertama Anda!
-                  </div>
-                )}
+                <button 
+                  onClick={() => setShowDeleteWantsModal(true)}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-lg"
+                >
+                  <Trash2 size={16} />
+                  Hapus
+                </button>
+                
+                <button 
+                  onClick={onClose}
+                  className="flex-1 border border-gray-600 text-gray-300 hover:bg-gray-800/50 px-4 py-2 rounded-lg font-bold transition-all text-sm"
+                >
+                  Tutup
+                </button>
               </div>
-            </div>
-          </div>
-
-          {/* Footer Buttons */}
-          <div className="flex justify-between gap-4 mt-12">
-            <button 
-              onClick={handleEditWantsClick} // Panggil fungsi baru
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2"
-            >
-              <Edit size={18} />
-              Edit Product
-            </button>
-            
-            <div className="flex gap-4">
-              <button 
-                onClick={onClose}
-                className="border border-gray-600 text-gray-300 hover:bg-gray-800 px-6 py-3 rounded-lg font-bold transition-all"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={onClose}
-                className="bg-[#1db978] hover:bg-[#19a369] text-white px-6 py-3 rounded-lg font-bold transition-all"
-              >
-                Save & Back
-              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Edit Budget Modal */}
       {showEditBudgetModal && selectedBudgetItem && (
         <EditBudget 
           onClose={() => {
@@ -246,20 +283,26 @@ const DetailBudget: React.FC<DetailBudgetProps> = ({
         />
       )}
 
-      {/* Edit Wants Modal */}
       {showEditWantsModal && (
         <EditWants 
           onClose={() => setShowEditWantsModal(false)}
-          onSave={(name, price, imageUrl) => {
-            // Update data wants langsung di parent dan tutup modal
-            onEditWant(name, price, imageUrl);
+          onSave={(name, price, imageUrl, imageFile) => {
+            onEditWant(name, price, imageUrl, imageFile);
             setShowEditWantsModal(false);
-            // User tetap di detail budget, tidak navigasi ke edit budget
           }}
           initialData={wantItem}
         />
       )}
-    </>
+
+      {showDeleteWantsModal && (
+        <DeleteWants 
+          onClose={() => setShowDeleteWantsModal(false)}
+          onConfirm={() => onDeleteWant(wantItem.id)}
+          wantName={wantItem.name}
+        />
+      )}
+      </>
+    </ModalPortal>
   );
 };
 

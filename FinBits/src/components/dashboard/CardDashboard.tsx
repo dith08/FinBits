@@ -1,15 +1,17 @@
-import FinanceCard from "../../ui/FinanceCard";
-import GoalsCard from "../../ui/GoalsCardDashboard";
-import HabitCard from "../../ui/HabitCard";
-import ProductivityCard from "../../ui/ProductivityCard";
+import { 
+  ProductivityScoreCard, 
+  FinanceScoreCard, 
+  HabitCard, 
+  GoalsStatCard 
+} from './cards';
 
 const CardDashboard = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <ProductivityCard />
-      <FinanceCard />
+      <ProductivityScoreCard />
+      <FinanceScoreCard />
       <HabitCard />
-      <GoalsCard />
+      <GoalsStatCard />
     </div>
   );
 };

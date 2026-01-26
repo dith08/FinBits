@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, X, Loader2, Zap } from 'lucide-react';
+import skillsService from '../../services/skillsService';
 
 interface SkillData {
   id: number;
@@ -19,6 +20,7 @@ interface EditMySkillProps {
 
 const EditMySkill: React.FC<EditMySkillProps> = ({ onClose, onSave, initialData }) => {
   const [formData, setFormData] = useState(initialData);
+  const [loading, setLoading] = useState(false);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -36,68 +38,91 @@ const EditMySkill: React.FC<EditMySkillProps> = ({ onClose, onSave, initialData 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    setLoading(true);
+    
+    skillsService.edit(formData.id, {
+      main_skill: formData.mainSkill,
+      current_level: formData.currentLevel,
+      skill_progress: formData.skillProgress,
+      sub_skills: formData.subSkills,
+      weekly_improvement: formData.weeklyImprovement,
+      next_step: formData.nextStep
+    })
+    .then(() => {
+      onSave(formData);
+      onClose();
+    })
+    .catch((error) => {
+      console.error('Error updating skill:', error);
+      alert('Gagal mengupdate skill');
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   };
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50 overflow-y-auto animate-fadeIn"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-2xl bg-[#121212] rounded-xl p-6 shadow-2xl border border-gray-800 relative my-4">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-gray-900 to-black rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-2xl shadow-green-500/10 border border-gray-800 my-auto animate-slideUp relative">
         
-        {/* Tombol Close */}
         <button 
           onClick={onClose}
-          className="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors"
+          className="absolute right-3 top-3 md:right-4 md:top-4 p-2 rounded-full bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
         
-        {/* Title */}
-        <h2 className="text-xl font-bold text-[#599EFF] text-center mb-6">
-          Edit My Skill
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+              Edit My Skill
+            </h1>
+            <p className="text-gray-400 text-xs">Perbarui skill Anda</p>
+          </div>
+        </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Row 1: Main Skill & Sub Skills */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Main Skill</label>
+              <label className="block text-gray-300 font-medium text-xs">Main Skill</label>
               <input 
                 type="text" 
                 name="mainSkill"
                 value={formData.mainSkill}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#599EFF] transition-all"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
                 required
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Sub Skills</label>
+              <label className="block text-gray-300 font-medium text-xs">Sub Skills</label>
               <input 
                 type="text" 
                 name="subSkills"
                 value={formData.subSkills}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#599EFF]"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
                 required
               />
             </div>
           </div>
 
-          {/* Row 2: Current Level & Weekly Improvement */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Current Level</label>
+              <label className="block text-gray-300 font-medium text-xs">Current Level</label>
               <div className="relative">
                 <select 
                   name="currentLevel"
                   value={formData.currentLevel}
                   onChange={handleInputChange}
-                  className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white appearance-none focus:outline-none focus:border-[#599EFF] cursor-pointer"
+                  className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white appearance-none focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 cursor-pointer transition-all"
                   required
                 >
                   <option value="">Pilih Level</option>
@@ -105,27 +130,26 @@ const EditMySkill: React.FC<EditMySkillProps> = ({ onClose, onSave, initialData 
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
                 </select>
-                <ChevronDown className="absolute right-2.5 top-3 text-gray-500 pointer-events-none" size={14} />
+                <ChevronDown className="absolute right-2.5 top-2.5 text-gray-500 pointer-events-none" size={16} />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Weekly Improvement</label>
+              <label className="block text-gray-300 font-medium text-xs">Weekly Improvement</label>
               <input 
                 type="text" 
                 name="weeklyImprovement"
                 value={formData.weeklyImprovement}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#599EFF]"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
                 placeholder="e.g. +5%"
               />
             </div>
           </div>
 
-          {/* Row 3: Skill Progress */}
           <div className="space-y-1.5">
-            <label className="block text-white text-xs font-medium">
-              Skill Progress: {formData.skillProgress}%
+            <label className="block text-gray-300 font-medium text-xs">
+              Skill Progress: <span className="text-green-400 font-bold">{formData.skillProgress}%</span>
             </label>
             <input 
               type="range"
@@ -134,49 +158,71 @@ const EditMySkill: React.FC<EditMySkillProps> = ({ onClose, onSave, initialData 
               max="100"
               value={formData.skillProgress}
               onChange={handleInputChange}
-              className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#599EFF]"
+              className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
             />
-            <div className="flex justify-between text-[10px] text-gray-400 px-1">
-              <span>0%</span>
-              <span>50%</span>
-              <span>100%</span>
-            </div>
           </div>
 
-          {/* Row 4: Next Step (Full Width) */}
           <div className="space-y-1.5">
-            <label className="block text-white text-xs font-medium">Next Step</label>
+            <label className="block text-gray-300 font-medium text-xs">Next Step</label>
             <textarea 
               name="nextStep"
               value={formData.nextStep}
               onChange={handleInputChange}
-              rows={3}
-              className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#599EFF] resize-none"
+              rows={2}
+              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 resize-none transition-all"
               placeholder="Describe your next learning steps..."
               required
             />
           </div>
 
-          {/* Action Buttons */}
-          <div className="pt-4">
-            <div className="flex justify-end gap-3">
-              <button 
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-all"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="px-6 py-2 text-sm bg-[#599EFF] hover:bg-[#478cff] text-white font-medium rounded-lg transition-all shadow-lg active:scale-95"
-              >
-                Update Skill
-              </button>
-            </div>
+          <div className="pt-2 flex gap-2 justify-end">
+            <button 
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs border border-gray-700 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 text-xs bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-bold rounded-lg transition-all disabled:opacity-50 flex items-center gap-1 shadow-lg hover:shadow-green-500/30"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Skill'
+              )}
+            </button>
           </div>
         </form>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { 
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+      `}</style>
     </div>
   );
 };

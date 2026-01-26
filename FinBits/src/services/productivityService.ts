@@ -1,6 +1,22 @@
-import type { RoadmapAIRequest, RoadmapAIResponse, RoadmapStep, SkillRequest, SkillResponse } from '../types/goal';
 import type { HabitAIRequest, HabitAIResponse, HabitRequest, HabitResponse, HabitStreakResponse, HabitTrackRequest, TodoAIRequest, TodoAIResponse, TodoRequest, TodoResponse, TopHabit } from '../types/productivity';
 import apiInstance from './apiInstance';
+import { AxiosError } from 'axios';
+
+interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+}
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof AxiosError) {
+    const data = error.response?.data as ApiErrorResponse | undefined;
+    return data?.message || data?.error || fallback;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return fallback;
+};
 
 export const productivityService = {
 
@@ -8,8 +24,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.post<TodoResponse>('/productivity/todo/add', data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal bikin task baru nih!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal bikin task baru nih!');
     }
   },
 
@@ -17,8 +33,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.get('/productivity/todo/all');
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal narik data To Do List!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal narik data To Do List!');
     }
   },
 
@@ -26,8 +42,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.get(`/productivity/todo/${id}`);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Task-nya nggak ketemu!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Task-nya nggak ketemu!');
     }
   },
 
@@ -35,8 +51,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.put(`/productivity/todo/edit/${id}`, data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update task!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal update task!');
     }
   },
 
@@ -44,8 +60,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.delete(`/productivity/todo/delete/${id}`);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus task!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal hapus task!');
     }
   },
 
@@ -53,8 +69,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.post<TodoAIResponse>('/productivity/todo/add-ai', data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'AI-nya lagi pusing, gagal generate task nih!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'AI-nya lagi pusing, gagal generate task nih!');
     }
   },
 
@@ -62,8 +78,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.post<HabitResponse>('/productivity/habit/add', data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal nambahin kebiasaan baru nih!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal nambahin kebiasaan baru nih!');
     }
   },
 
@@ -71,8 +87,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.get('/productivity/habit/all');
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal narik data Habits!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal narik data Habits!');
     }
   },
 
@@ -80,8 +96,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.get(`/productivity/habit/${id}`);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Habit-nya nggak ketemu!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Habit-nya nggak ketemu!');
     }
   },
 
@@ -89,8 +105,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.put(`/productivity/habit/edit/${id}`, data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update habit!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal update habit!');
     }
   },
 
@@ -98,8 +114,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.delete(`/productivity/habit/delete/${id}`);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus habit!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal hapus habit!');
     }
   },
   
@@ -107,8 +123,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.get('/productivity/habit/top');
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal narik data statistik habit!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal narik data statistik habit!');
     }
   },
 
@@ -116,8 +132,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.post<HabitAIResponse>('/productivity/add-with-ai', data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'AI-nya gagal bikin habit, coba lagi nanti cuy!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'AI-nya gagal bikin habit, coba lagi nanti cuy!');
     }
   },
 
@@ -125,8 +141,8 @@ export const productivityService = {
     try {
       const response = await apiInstance.post<HabitStreakResponse>(`/productivity/habit/track/${habitId}`, data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update status habit hari ini!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal update status habit hari ini!');
     }
   },
 
@@ -134,8 +150,35 @@ export const productivityService = {
     try {
       const response = await apiInstance.get<HabitStreakResponse>(`/productivity/habit/tracking/${habitId}`);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal ambil data histori habit!';
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal ambil data histori habit!');
+    }
+  },
+
+  getNotifications: async () => {
+    try {
+      const response = await apiInstance.get('/productivity/notification/get');
+      return response.data;
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal ambil notifikasi!');
+    }
+  },
+
+  readAllNotifications: async () => {
+    try {
+      const response = await apiInstance.put('/productivity/notification/read-all');
+      return response.data;
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal tandai semua notifikasi!');
+    }
+  },
+
+  clearAllNotifications: async () => {
+    try {
+      const response = await apiInstance.delete('/productivity/notification/clear-all');
+      return response.data;
+    } catch (error: unknown) {
+      throw getErrorMessage(error, 'Gagal hapus semua notifikasi!');
     }
   },
 

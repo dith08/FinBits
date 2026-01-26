@@ -1,4 +1,3 @@
-// ui/EditTabungan.tsx
 import React, { useState, useEffect } from 'react';
 import { Calendar, X } from 'lucide-react';
 
@@ -53,7 +52,6 @@ const EditTabungan: React.FC<EditTabunganProps> = ({ onClose, onSave, initialDat
     >
       <div className="bg-[#121212] text-white p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-800 relative">
         
-        {/* Tombol Close */}
         <button 
           onClick={onClose}
           className="absolute right-6 top-6 text-gray-400 hover:text-white transition-colors"

@@ -1,18 +1,21 @@
-// components/TargetWants.tsx (update dengan tambahan EditWants)
-import React, { useState } from 'react';
-import { Eye } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Eye, Loader2, Plus, RefreshCw, Target } from "lucide-react";
 import AddWants from './AddWants';
 import AddBudget from './AddBudget';
 import DetailBudget from './DetailBudget';
 import EditBudget from './EditBudget';
 import EditWants from './EditWants';
-
+import { wantsService } from '../../services/financeService';
+import { AlertModal } from '../common';
+import { useAlert } from '../../hooks';
 
 interface WantItem {
   id: number;
   name: string;
   price: number;
   imageUrl: string;
+  budgetSet: number;
+  isPurchased: boolean;
 }
 
 interface BudgetItem {
@@ -27,22 +30,66 @@ export const TargetWants: React.FC = () => {
   const [showDetailBudget, setShowDetailBudget] = useState(false);
   const [showEditBudget, setShowEditBudget] = useState(false);
   const [showEditWants, setShowEditWants] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { alert, showError, closeAlert } = useAlert();
   
-  const [currentWant, setCurrentWant] = useState<WantItem>({
-    id: 1,
-    name: "Laptop ROG Strix G15",
-    price: 30000000,
-    imageUrl: "https://images.unsplash.com/photo-1611078489935-0cb964de46d6?auto=format&fit=crop&q=80&w=300"
-  });
-
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
-    { id: 1, amount: 2000000, date: '2024-01-15' },
-    { id: 2, amount: 1500000, date: '2024-01-20' },
-    { id: 3, amount: 1500000, date: '2024-02-01' },
-  ]);
-
-  const [currentBudget, setCurrentBudget] = useState(5000000);
+  const [currentWant, setCurrentWant] = useState<WantItem | null>(null);
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [editingBudgetItem, setEditingBudgetItem] = useState<BudgetItem | null>(null);
+
+const fetchWantsData = async () => {
+  try {
+    setLoading(true);
+    const response = await wantsService.getAll();
+    
+    const BASE_URL = 'https://api-finbits.rplrus.com';
+
+    const transformedData: WantItem[] = (response.data || []).map((item: Record<string, unknown>) => {
+      let imageUrl = (item.image_url as string) || '';
+      
+      if (imageUrl && imageUrl.trim()) {
+        imageUrl = imageUrl.replace(/^\/home\/[^/]+\/[^/]+\//, '');
+        
+        if (!imageUrl.startsWith('http')) {
+          imageUrl = imageUrl.replace(/^\/+/, '');
+          imageUrl = `${BASE_URL}/${imageUrl}`;
+        }
+      } else {
+        imageUrl = "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=300";
+      }
+      
+      return {
+        id: item.want_id as number,
+        name: item.item_name as string,
+        price: Number(item.price),
+        imageUrl: imageUrl,
+        budgetSet: Number(item.budget_set),
+        isPurchased: item.is_purchased as boolean,
+      };
+    });
+    
+    if (transformedData.length > 0) setCurrentWant(transformedData[0]);
+  } catch (err: unknown) {
+    let message = 'Gagal memuat data';
+    if (err && typeof err === 'object' && 'response' in err) {
+      const response = (err as Record<string, unknown>).response;
+      if (response && typeof response === 'object' && 'data' in response) {
+        const data = (response as Record<string, unknown>).data;
+        if (data && typeof data === 'object' && 'message' in data) {
+          message = (data as Record<string, unknown>).message as string;
+        }
+      }
+    }
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
+    fetchWantsData();
+  }, []);
 
   const formatIDR = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -52,38 +99,97 @@ export const TargetWants: React.FC = () => {
     }).format(amount).replace('Rp', 'Rp ');
   };
 
-  const handleAddBudget = (amount: number, date: string) => {
-    const newItem: BudgetItem = {
-      id: Date.now(),
-      amount,
-      date
-    };
-    setBudgetItems(prev => [...prev, newItem]);
-    setCurrentBudget(prev => prev + amount);
-    setShowAddBudget(false);
+  const handleAddBudget = async (amount: number, date: string) => {
+    if (!currentWant) return;
+    
+    try {
+      const newBudgetSet = currentWant.budgetSet + amount;
+      await wantsService.edit(currentWant.id, {
+        item_name: currentWant.name,
+        price: currentWant.price,
+        budget_set: newBudgetSet,
+      });
+      
+      const newItem: BudgetItem = {
+        id: Date.now(),
+        amount,
+        date
+      };
+      setBudgetItems(prev => [...prev, newItem]);
+      
+      await fetchWantsData();
+      setShowAddBudget(false);
+    } catch (err: unknown) {
+      let message = 'Gagal menambah budget';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as Record<string, unknown>).response;
+        if (response && typeof response === 'object' && 'data' in response) {
+          const data = (response as Record<string, unknown>).data;
+          if (data && typeof data === 'object' && 'message' in data) {
+            message = (data as Record<string, unknown>).message as string;
+          }
+        }
+      }
+      console.error('Error adding budget:', err);
+      showError(message);
+    }
   };
 
-  const handleAddWant = (name: string, price: number, imageUrl: string) => {
-    const newWant: WantItem = {
-      id: Date.now(),
-      name,
-      price,
-      imageUrl: imageUrl || "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=300"
-    };
-    setCurrentWant(newWant);
+ const handleAddWant = async (name: string, price: number, _imageUrl: string, imageFile?: File) => {
+  try {
+    await wantsService.add({
+      item_name: name,
+      price: Number(price),
+      budget_set: 0,
+      item_image: imageFile
+    });
+    
+    await fetchWantsData();
     setShowAddWants(false);
-  };
+  } catch (err: unknown) {
+    let message = 'Gagal menambah wants';
+    if (err && typeof err === 'object' && 'response' in err) {
+      const response = (err as Record<string, unknown>).response;
+      if (response && typeof response === 'object' && 'data' in response) {
+        const data = (response as Record<string, unknown>).data;
+        if (data && typeof data === 'object' && 'message' in data) {
+          message = (data as Record<string, unknown>).message as string;
+        }
+      }
+    }
+    console.error('Error adding want:', err);
+    showError(message);
+  }
+};
 
-  const handleEditWant = (name: string, price: number, imageUrl: string) => {
-    setCurrentWant(prev => ({
-      ...prev,
-      name,
-      price,
-      imageUrl
-    }));
+  const handleEditWant = async (name: string, price: number, _imageUrl: string, imageFile?: File | null) => {
+  if (!currentWant) return;
+  
+  try {
+    await wantsService.edit(currentWant.id, {
+      item_name: name,
+      price: Number(price),
+      budget_set: currentWant.budgetSet,
+      item_image: imageFile || undefined
+    });
+    
+    await fetchWantsData();
     setShowEditWants(false);
-    // Tidak menutup detail budget, biarkan user tetap di detail
-  };
+  } catch (err: unknown) {
+    let message = 'Gagal mengupdate wants';
+    if (err && typeof err === 'object' && 'response' in err) {
+      const response = (err as Record<string, unknown>).response;
+      if (response && typeof response === 'object' && 'data' in response) {
+        const data = (response as Record<string, unknown>).data;
+        if (data && typeof data === 'object' && 'message' in data) {
+          message = (data as Record<string, unknown>).message as string;
+        }
+      }
+    }
+    console.error('Error editing want:', err);
+    showError(message);
+  }
+};
 
   const handleEditBudgetClick = (item: BudgetItem) => {
     setEditingBudgetItem(item);
@@ -92,7 +198,6 @@ export const TargetWants: React.FC = () => {
 
   const handleSaveEditBudget = (amount: number, date: string) => {
     if (editingBudgetItem) {
-      const oldAmount = editingBudgetItem.amount;
       const updatedItem = { ...editingBudgetItem, amount, date };
       
       const newItems = budgetItems.map(item => 
@@ -100,7 +205,6 @@ export const TargetWants: React.FC = () => {
       );
       
       setBudgetItems(newItems);
-      setCurrentBudget(prev => prev - oldAmount + amount);
       setShowEditBudget(false);
       setEditingBudgetItem(null);
     }
@@ -110,127 +214,201 @@ export const TargetWants: React.FC = () => {
     const itemToDelete = budgetItems.find(item => item.id === id);
     if (itemToDelete) {
       setBudgetItems(prev => prev.filter(item => item.id !== id));
-      setCurrentBudget(prev => prev - itemToDelete.amount);
     }
   };
 
-  const progress = (currentBudget / currentWant.price) * 100;
+  const handleDeleteWant = async (id: number) => {
+    try {
+      await wantsService.delete(id);
+      await fetchWantsData();
+    } catch (err: unknown) {
+      let message = 'Gagal menghapus wants';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as Record<string, unknown>).response;
+        if (response && typeof response === 'object' && 'data' in response) {
+          const data = (response as Record<string, unknown>).data;
+          if (data && typeof data === 'object' && 'message' in data) {
+            message = (data as Record<string, unknown>).message as string;
+          }
+        }
+      }
+      console.error('Error deleting want:', err);
+      showError(message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-white p-6 rounded-lg border border-gray-800 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#00b894]" />
+      </div>
+    );
+  }
+
+  const progress = currentWant ? (currentWant.budgetSet / currentWant.price) * 100 : 0;
 
   return (
-    <div className="text-white p-6 rounded-lg border border-gray-800 relative">
-      <div className="absolute top-4 right-4">
+    <div className="relative overflow-hidden text-white p-8 rounded-[2rem] border border-gray-800 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:border-gray-700">
+      
+      <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00b894]/10 rounded-full blur-[80px]"></div>
+      <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px]"></div>
+
+      <div className="flex justify-between items-center mb-8 relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-[#00b894]/10 rounded-lg">
+            <Target size={20} className="text-[#00b894]" />
+          </div>
+          <h1 className="bg-gradient-to-r from-[#00b894] to-[#55efc4] bg-clip-text text-transparent text-xl font-black uppercase tracking-widest">
+            Target Keinginan
+          </h1>
+        </div>
+        
         <button 
           onClick={() => setShowDetailBudget(true)}
-          className="p-1.5 border border-gray-700 rounded-lg text-gray-500 hover:text-gray-300 hover:border-gray-500 transition-colors"
+          className="p-2.5 bg-gray-800/40 border border-gray-700 rounded-xl text-gray-400 hover:text-[#00b894] hover:border-[#00b894]/50 transition-all duration-300 group shadow-lg"
         >
-          <Eye size={16} />
+          <Eye size={18} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
 
-      <h1 className="text-[#00b894] text-xl font-bold text-center mb-4 mt-2">
-        Target Wants
-      </h1>
-
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-gray-300">Progress</span>
-          <span className="text-[#00b894] font-bold">{Math.min(100, progress).toFixed(1)}%</span>
+      {error && (
+        <div className="relative z-10 bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6 text-red-400 text-sm flex items-center justify-between backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <span>{error}</span>
+          </div>
+          <button 
+            onClick={fetchWantsData} 
+            className="flex items-center gap-1 bg-red-500/20 hover:bg-red-500/30 px-3 py-1.5 rounded-lg transition-all font-bold"
+          >
+            <RefreshCw size={14} /> Coba lagi
+          </button>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-1.5">
-          <div 
-            className="bg-[#00b894] h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${Math.min(100, progress)}%` }}
-          ></div>
-        </div>
-      </div>
-
-      <div className="w-full flex justify-center mb-4">
-        <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center p-2">
-          <img 
-            src={currentWant.imageUrl}
-            alt={currentWant.name}
-            className="object-contain w-full h-full max-h-full"
-          />
-        </div>
-      </div>
-
-      <h2 className="text-center font-semibold mb-4 text-sm">
-        {currentWant.name}
-      </h2>
-
-      <div className="space-y-2 mb-6">
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-300">Harga :</span>
-          <span className="font-semibold">{formatIDR(currentWant.price)}</span>
-        </div>
-        
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-300">Budget saat ini:</span>
-          <span className="font-semibold">{formatIDR(currentBudget)}</span>
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <button 
-          onClick={() => setShowAddBudget(true)}
-          className="flex-1 border border-gray-600 hover:bg-gray-800 hover:border-[#00b894] py-2 px-3 rounded-lg transition-all text-xs font-semibold"
-        >
-          Add Budget
-        </button>
-        
-        <button 
-          onClick={() => setShowAddWants(true)}
-          className="flex-1 border border-gray-600 hover:bg-gray-800 hover:border-[#00b894] py-2 px-3 rounded-lg transition-all text-xs font-semibold"
-        >
-          Add Wants
-        </button>
-      </div>
-
-      {/* Modals */}
-      {showAddWants && (
-        <AddWants 
-          onClose={() => setShowAddWants(false)}
-          onAdd={handleAddWant}
-        />
       )}
 
-      {showAddBudget && (
-        <AddBudget 
-          onClose={() => setShowAddBudget(false)}
-          onAdd={handleAddBudget}
-        />
-      )}
+      <div className="relative z-10">
+        {!currentWant ? (
+          <div className="text-center py-12 bg-gray-900/30 rounded-3xl border border-dashed border-gray-700">
+            <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-5 border border-gray-700 shadow-inner">
+              <Plus size={32} className="text-gray-500" />
+            </div>
+            <p className="text-gray-400 mb-6 font-medium italic">Belum ada wishlist yang aktif.</p>
+            <button 
+              onClick={() => setShowAddWants(true)}
+              className="px-8 py-3 bg-white text-black font-black rounded-xl hover:bg-[#00b894] hover:text-white transition-all duration-300 transform hover:-translate-y-1 shadow-xl"
+            >
+              Mulai Tambah Target
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <div className="flex justify-between items-end mb-3">
+                <span className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black">Progres Menabung</span>
+                <span className="text-[#00b894] text-2xl font-black tracking-tighter">
+                  {Math.min(100, progress).toFixed(1)}<span className="text-xs ml-0.5">%</span>
+                </span>
+              </div>
+              <div className="w-full bg-gray-800/50 rounded-full h-4 p-1 border border-gray-700/30">
+                <div 
+                  className="h-full rounded-full bg-gradient-to-r from-[#00b894] via-[#55efc4] to-blue-400 shadow-[0_0_20px_rgba(0,184,148,0.3)] transition-all duration-[1500ms] ease-out"
+                  style={{ width: `${Math.min(100, progress)}%` }}
+                ></div>
+              </div>
+            </div>
 
-      {showDetailBudget && (
+            <div className="w-full flex justify-center mb-8">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#00b894] to-blue-500 rounded-[2.5rem] blur-2xl opacity-10 group-hover:opacity-25 transition duration-500"></div>
+                <div className="relative w-44 h-44 bg-white rounded-[2rem] overflow-hidden flex items-center justify-center p-4 shadow-2xl transform group-hover:rotate-2 transition duration-500">
+                  <img 
+                    src={currentWant.imageUrl}
+                    alt={currentWant.name}
+                    className="object-contain w-full h-full transform group-hover:scale-110 transition duration-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h2 className="text-center font-black text-xl mb-8 tracking-tight text-white drop-shadow-md">
+              {currentWant.name}
+            </h2>
+
+            <div className="grid grid-cols-1 gap-4 mb-10">
+              <div className="group bg-white/5 border border-gray-800 hover:border-gray-700 p-4 rounded-2xl flex justify-between items-center transition-all">
+                <div className="flex flex-col">
+                  <span className="text-gray-500 text-[10px] uppercase font-bold">Harga</span>
+                  <span className="font-mono font-black text-lg text-gray-200">{formatIDR(currentWant.price)}</span>
+                </div>
+                <div className="text-gray-600 group-hover:text-[#00b894] transition-colors">
+                  💰
+                </div>
+              </div>
+              
+              <div className="group bg-white/5 border border-gray-800 hover:border-gray-700 p-4 rounded-2xl flex justify-between items-center transition-all">
+                <div className="flex flex-col">
+                  <span className="text-gray-500 text-[10px] uppercase font-bold">Terkumpul</span>
+                  <span className="font-mono font-black text-lg text-blue-400">{formatIDR(currentWant.budgetSet)}</span>
+                </div>
+                <div className="text-gray-600 group-hover:text-blue-400 transition-colors">
+                  🏦
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setShowAddBudget(true)}
+                className="flex-[2] bg-[#00b894] hover:bg-[#00a383] text-[#0d1117] py-4 rounded-2xl transition-all duration-300 font-black uppercase tracking-tighter shadow-[0_10px_20px_rgba(0,184,148,0.2)] active:scale-95"
+              >
+                + Tambah Budget
+              </button>
+              
+              <button 
+                onClick={() => setShowAddWants(true)}
+                className="flex-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 py-4 rounded-2xl transition-all duration-300 font-black uppercase tracking-tighter active:scale-95 text-xs"
+              >
+                Target Baru
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {showAddWants && <AddWants onClose={() => setShowAddWants(false)} onAdd={handleAddWant} />}
+      {showAddBudget && <AddBudget onClose={() => setShowAddBudget(false)} onAdd={handleAddBudget} />}
+      {showDetailBudget && currentWant && (
         <DetailBudget 
           onClose={() => setShowDetailBudget(false)}
           wantItem={currentWant}
           budgetItems={budgetItems}
-          currentBudget={currentBudget}
+          currentBudget={currentWant.budgetSet}
           onEditClick={handleEditBudgetClick}
           onDelete={handleDeleteBudget}
           onEditWant={handleEditWant}
+          onDeleteWant={handleDeleteWant}
         />
       )}
-
       {showEditBudget && editingBudgetItem && (
         <EditBudget 
-          onClose={() => {
-            setShowEditBudget(false);
-            setEditingBudgetItem(null);
-          }}
+          onClose={() => { setShowEditBudget(false); setEditingBudgetItem(null); }}
           onAdd={handleSaveEditBudget}
         />
       )}
-
-      {showEditWants && (
+      {showEditWants && currentWant && (
         <EditWants 
           onClose={() => setShowEditWants(false)}
           onSave={handleEditWant}
           initialData={currentWant}
         />
       )}
+
+      <AlertModal
+        isOpen={alert.isOpen}
+        onClose={closeAlert}
+        type={alert.type}
+        title={alert.title}
+        message={alert.message}
+      />
     </div>
   );
 };

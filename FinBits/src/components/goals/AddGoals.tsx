@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
-import { Camera, Calendar, ChevronDown, X } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, ChevronDown, X, Loader2, Target } from 'lucide-react';
+import { AlertModal } from '../common';
 
 interface GoalData {
   name: string;
@@ -13,7 +14,7 @@ interface GoalData {
 
 interface AddGoalsProps {
   onClose: () => void;
-  onAdd: (goal: GoalData) => void;
+  onAdd: (goal: GoalData) => Promise<void> | void;
 }
 
 const AddGoalForm: React.FC<AddGoalsProps> = ({ onClose, onAdd }) => {
@@ -27,8 +28,8 @@ const AddGoalForm: React.FC<AddGoalsProps> = ({ onClose, onAdd }) => {
     roadmapImage: undefined
   });
   
-  const [roadmapImage, setRoadmapImage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -44,132 +45,133 @@ const AddGoalForm: React.FC<AddGoalsProps> = ({ onClose, onAdd }) => {
     }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 3 * 1024 * 1024) { // 3MB
-        alert('File terlalu besar. Maksimal 3MB.');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageUrl = reader.result as string;
-        setRoadmapImage(imageUrl);
-        setFormData(prev => ({ ...prev, roadmapImage: imageUrl }));
-      };
-      reader.readAsDataURL(file);
+  const handleSubmit = async () => {
+    console.log('Form data:', formData);
+    
+    if (!formData.name) {
+      setValidationError('Nama tujuan harus diisi');
+      return;
     }
-  };
-
-  const handleSubmit = () => {
-    if (formData.name && formData.category && formData.outcome && formData.why && formData.deadline) {
-      onAdd({
-        ...formData,
-        roadmapImage: roadmapImage || undefined
-      });
-      onClose();
+    if (!formData.category) {
+      setValidationError('Kategori harus dipilih');
+      return;
     }
-  };
+    if (!formData.outcome) {
+      setValidationError('Hasil yang diharapkan harus diisi');
+      return;
+    }
+    if (!formData.why) {
+      setValidationError('Alasan harus diisi');
+      return;
+    }
+    if (!formData.deadline) {
+      setValidationError('Batas waktu harus diisi');
+      return;
+    }
 
-  const handleRemoveImage = () => {
-    setRoadmapImage(null);
-    setFormData(prev => ({ ...prev, roadmapImage: undefined }));
+    setLoading(true);
+    try {
+      console.log('Calling onAdd with:', formData);
+      await onAdd(formData);
+      console.log('onAdd completed');
+    } catch (error) {
+      console.error('Error in handleSubmit:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 overflow-y-auto"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50 overflow-y-auto animate-fadeIn"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-2xl bg-[#121212] rounded-xl p-6 shadow-2xl border border-gray-800 relative my-4">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-gray-900 to-black rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl shadow-green-500/10 border border-gray-800 my-auto animate-slideUp relative">
         
-        {/* Tombol Close */}
         <button 
           onClick={onClose}
-          className="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors"
+          className="absolute right-4 top-4 md:right-6 md:top-6 p-2 rounded-full bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
         
-        {/* Title - lebih kecil */}
-        <h2 className="text-xl font-bold text-[#10B981] text-center mb-5">
-          Add New Goals
-        </h2>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
+            <Target className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+              Tambah Tujuan Baru
+            </h1>
+            <p className="text-gray-400 text-xs md:text-sm">Tetapkan tujuan baru Anda</p>
+          </div>
+        </div>
 
-        <div className="space-y-4">
-          {/* Row 1: Nama Goals & Category */}
+        <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Nama Goals */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Nama Goals</label>
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">Nama Tujuan</label>
               <input 
                 type="text" 
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#10B981] transition-all"
-                placeholder="Masukkan nama goal"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-3 md:p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
+                placeholder="Masukkan nama tujuan"
               />
             </div>
 
-            {/* Category */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Category</label>
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">Kategori</label>
               <div className="relative">
                 <select 
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white appearance-none focus:outline-none focus:border-[#10B981]"
+                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-3 md:p-4 text-white appearance-none focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all cursor-pointer"
                 >
                   <option value="">Pilih Kategori</option>
-                  <option value="Career">Career</option>
-                  <option value="Education">Education</option>
-                  <option value="Health">Health</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Personal">Personal</option>
+                  <option value="Career">Karir</option>
+                  <option value="Education">Pendidikan</option>
+                  <option value="Health">Kesehatan</option>
+                  <option value="Finance">Keuangan</option>
+                  <option value="Personal">Pribadi</option>
                 </select>
-                <ChevronDown className="absolute right-2.5 top-3 text-gray-500 pointer-events-none" size={14} />
+                <ChevronDown className="absolute right-3 top-3 md:top-4 text-gray-500 pointer-events-none" size={18} />
               </div>
             </div>
           </div>
 
-          {/* Row 2: Outcome & Why */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Outcome */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Outcome</label>
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">Hasil yang Diharapkan</label>
               <input 
                 type="text" 
                 name="outcome"
                 value={formData.outcome}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#10B981]"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-3 md:p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
                 placeholder="Hasil yang diharapkan"
               />
             </div>
 
-            {/* Why */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Why</label>
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">Alasan</label>
               <input 
                 type="text" 
                 name="why"
                 value={formData.why}
                 onChange={handleInputChange}
-                className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#10B981]"
-                placeholder="Alasan mencapai goal ini"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-3 md:p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 transition-all"
+                placeholder="Alasan mencapai tujuan ini"
               />
             </div>
           </div>
 
-          {/* Row 3: Progress & Deadline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Progress */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">
-                Progress: {formData.progress}%
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">
+                Progres: <span className="text-green-400 font-bold">{formData.progress}%</span>
               </label>
               <input 
                 type="range"
@@ -178,98 +180,94 @@ const AddGoalForm: React.FC<AddGoalsProps> = ({ onClose, onAdd }) => {
                 max="100"
                 value={formData.progress}
                 onChange={handleInputChange}
-                className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#10B981]"
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
               />
-              <div className="flex justify-between text-[10px] text-gray-400 px-1">
+              <div className="flex justify-between text-xs text-gray-400 px-1">
                 <span>0%</span>
                 <span>50%</span>
                 <span>100%</span>
               </div>
             </div>
 
-            {/* Deadline */}
-            <div className="space-y-1.5">
-              <label className="block text-white text-xs font-medium">Deadline</label>
+            <div className="space-y-2">
+              <label className="block text-gray-300 font-medium text-sm">Batas Waktu</label>
               <div className="relative">
                 <input 
                   type="date"
                   name="deadline"
                   value={formData.deadline}
                   onChange={handleInputChange}
-                  className="w-full bg-[#1A1A1A] border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#10B981] appearance-none cursor-pointer"
+                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl p-3 md:p-4 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/50 appearance-none cursor-pointer transition-all"
                   style={{ colorScheme: 'dark' }}
                 />
-                <Calendar className="absolute right-2.5 top-3 text-gray-500 pointer-events-none" size={14} />
               </div>
             </div>
           </div>
 
-          {/* Roadmaps / Upload Image - Full Width */}
-          <div className="space-y-1.5">
-            <label className="block text-white text-xs font-medium">Roadmaps</label>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-              accept="image/*"
-              className="hidden"
-            />
-            
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className={`w-full border ${roadmapImage ? 'border-[#10B981]' : 'border-gray-700'} border-dashed rounded-lg p-4 flex flex-col items-center justify-center bg-[#1A1A1A] hover:bg-[#222] transition-colors cursor-pointer`}
-            >
-              {roadmapImage ? (
-                <div className="relative w-full max-w-xs">
-                  <img 
-                    src={roadmapImage} 
-                    alt="Roadmap preview" 
-                    className="w-full h-28 object-contain rounded mb-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveImage();
-                    }}
-                    className="absolute top-1 right-1 p-1.5 bg-red-900/50 hover:bg-red-800/70 rounded transition-colors"
-                  >
-                    <X size={14} className="text-red-400" />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="p-3 rounded-full mb-2">
-                    <Camera className="text-gray-500" size={24} />
-                  </div>
-                  <span className="text-gray-500 font-medium text-sm">Upload Roadmap</span>
-                  <span className="text-gray-600 text-xs mt-0.5">PNG, JPG (Max 3MB)</span>
-                </>
-              )}
-            </div>
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+            <p className="text-green-400 text-sm font-medium">
+              💡 Roadmap bisa di-generate otomatis dengan AI setelah tujuan dibuat. Klik "Lihat Roadmap" pada kartu tujuan.
+            </p>
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-4">
-            <div className="flex justify-end gap-3">
-              <button 
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-all"
-              >
-                Cancel
-              </button>
-              <button 
-                type="button"
-                onClick={handleSubmit}
-                className="px-6 py-2 text-sm bg-[#10B981] hover:bg-[#059669] text-white font-medium rounded-lg transition-all"
-              >
-                Add Goals
-              </button>
-            </div>
+          <div className="pt-4 flex gap-3 justify-end">
+            <button 
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-6 py-3 text-sm border border-gray-700 text-gray-300 hover:text-white rounded-xl hover:bg-gray-800/50 transition-all disabled:opacity-50 font-medium"
+            >
+              Batal
+            </button>
+            <button 
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-6 py-3 text-sm bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-bold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg hover:shadow-green-500/30"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Tambah Tujuan'
+              )}
+            </button>
           </div>
         </div>
+
+        <AlertModal
+          isOpen={!!validationError}
+          onClose={() => setValidationError(null)}
+          type="warning"
+          title="Validasi Form"
+          message={validationError || ''}
+        />
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { 
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+      `}</style>
     </div>
   );
 };

@@ -7,6 +7,7 @@ export interface LoginRequest {
     message: string;
     token: string;
     user_id: number;
+    refresh_token?: string;
   }
   
   export interface RegisterRequest {

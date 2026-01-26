@@ -1,211 +1,237 @@
 import apiInstance from './apiInstance';
-import type { BudgetAssistanceRequest, BudgetAssistanceResponse, ExpenseRequest, ExpenseResponse, IncomeRequest, IncomeResponse, SavingRequest, SavingResponse, ScanMutasiResponse, WantRequest, WantResponse } from '../types/finance';
 
-export const financeService = {
-  addIncome: async (data: IncomeRequest): Promise<IncomeResponse> => {
-    try {
-      const response = await apiInstance.post<IncomeResponse>('/finance/income/add', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal nambahin pemasukan nih!';
-    }
+interface IncomeRequest {
+  amount: number;
+  description: string;
+  category: string;
+  date: string;
+  notes?: string;
+  source: string;
+}
+
+interface ExpenseRequest {
+  amount: number;
+  source: string;
+  date: string;
+  category: string;
+}
+
+interface WantRequest {
+  item_name: string;
+  price: number;
+  budget_set: number;
+  item_image?: File | string;
+  image_url?: string;
+}
+
+interface SavingRequest {
+  goal_name: string;
+  target_amount: number;
+  target_date: string;
+}
+
+interface TopupRequest {
+  amount: number;
+  topup_date: string;
+}
+
+interface BudgetAssistanceRequest {
+  income: number;
+  role: string;
+}
+
+interface BudgetAssistanceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user_id: number;
+    month_year: string;
+    income: number;
+    needs_amount: number;
+    wants_amount: number;
+    saving_amount: number;
+    daily_snack_limit: number;
+    estimated_balance_30_days: number;
+    needs_note: string;
+    wants_note: string;
+    saving_note: string;
+    general_note: string;
+  };
+}
+
+interface ScanMutasiResponse {
+  success: boolean;
+  message: string;
+  analysis_report: {
+    pola_boros: string;
+    kebiasaan: string;
+    kategori_bocor: string;
+    saran_hemat: string;
+    prediksi_saldo: string;
+  };
+  raw_text_detected: string;
+}
+
+export const incomeService = {
+  getAll: async () => {
+    const response = await apiInstance.get('/finance/income/all');
+    return response.data;
   },
 
-  getIncomes: async () => {
-    try {
-      const response = await apiInstance.get('/finance/income/all');
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal ambil semua data!';
-    }
+  getById: async (id: number) => {
+    const response = await apiInstance.get(`/finance/income/${id}`);
+    return response.data;
   },
 
-  getIncomeById: async (id: number) => {
-    try {
-      const response = await apiInstance.get(`/finance/income/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Data nggak ketemu nih!';
-    }
+  add: async (data: IncomeRequest) => {
+    const response = await apiInstance.post('/finance/income/add', data);
+    return response.data;
   },
 
-  updateIncome: async (id: number, data: Partial<IncomeRequest>) => {
-    try {
-      const response = await apiInstance.put(`/finance/income/edit/${id}`, data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update data!';
-    }
+  edit: async (id: number, data: IncomeRequest) => {
+    const response = await apiInstance.put(`/finance/income/edit/${id}`, data);
+    return response.data;
   },
 
-  deleteIncome: async (id: number) => {
-    try {
-      const response = await apiInstance.delete(`/finance/income/delete/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus data!';
-    }
+  delete: async (id: number) => {
+    const response = await apiInstance.delete(`/finance/income/delete/${id}`);
+    return response.data;
+  },
+};
+
+export const expenseService = {
+  getAll: async () => {
+    const response = await apiInstance.get('/finance/expense/all');
+    return response.data;
   },
 
-  addExpense: async (data: ExpenseRequest): Promise<ExpenseResponse> => {
-    try {
-      const response = await apiInstance.post<ExpenseResponse>('/finance/expense/add', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal nambahin pengeluaran!';
-    }
+  getById: async (id: number) => {
+    const response = await apiInstance.get(`/finance/expense/${id}`);
+    return response.data;
   },
 
-  getExpenses: async () => {
-    try {
-      const response = await apiInstance.get('/finance/expense/all');
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal ambil list pengeluaran!';
-    }
+  add: async (data: ExpenseRequest) => {
+    const response = await apiInstance.post('/finance/expense/add', data);
+    return response.data;
   },
 
-  getExpenseById: async (id: number) => {
-    try {
-      const response = await apiInstance.get(`/finance/expense/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Detail pengeluaran nggak ketemu!';
-    }
+  edit: async (id: number, data: ExpenseRequest) => {
+    const response = await apiInstance.put(`/finance/expense/edit/${id}`, data);
+    return response.data;
   },
 
-  updateExpense: async (id: number, data: Partial<ExpenseRequest>) => {
-    try {
-      const response = await apiInstance.put(`/finance/expense/edit/${id}`, data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update pengeluaran!';
-    }
+  delete: async (id: number) => {
+    const response = await apiInstance.delete(`/finance/expense/delete/${id}`);
+    return response.data;
+  },
+};
+
+export const wantsService = {
+  getAll: async () => {
+    const response = await apiInstance.get('/finance/wants/all');
+    return response.data;
   },
 
-  deleteExpense: async (id: number) => {
-    try {
-      const response = await apiInstance.delete(`/finance/expense/delete/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus pengeluaran!';
-    }
+  getById: async (id: number) => {
+    const response = await apiInstance.get(`/finance/wants/${id}`);
+    return response.data;
   },
 
-  addWant: async (data: WantRequest): Promise<WantResponse> => {
-    try {
-      const formData = new FormData();
-      formData.append('item_name', data.item_name);
-      formData.append('price', data.price.toString());
-      formData.append('budget_set', data.budget_set.toString());
-      if (data.item_image) {
-        formData.append('item_image', data.item_image);
-      }
-
-      const response = await apiInstance.post<WantResponse>('finance/wants/add', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal nambahin barang impian!';
+  add: async (data: WantRequest) => {
+    const formData = new FormData();
+    formData.append('item_name', data.item_name);
+    formData.append('price', data.price.toString());
+    formData.append('budget_set', data.budget_set.toString());
+    
+    if (data.item_image && data.item_image instanceof File) {
+      formData.append('item_image', data.item_image);
     }
+    
+    const response = await apiInstance.post('/finance/wants/add', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
   },
 
-  getWants: async (id: number) => {
-    try {
-      const response = await apiInstance.get(`/finance/wants/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'data wants nggak ketemu!';
+  edit: async (id: number, data: WantRequest) => {
+    const formData = new FormData();
+    formData.append('item_name', data.item_name);
+    formData.append('price', data.price.toString());
+    formData.append('budget_set', data.budget_set.toString());
+    
+    if (data.item_image && data.item_image instanceof File) {
+      formData.append('item_image', data.item_image);
     }
+    
+    const response = await apiInstance.put(`/finance/wants/edit/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
   },
 
-  updateWant: async (id: number, data: Partial<WantRequest>) => {
-    try {
-      const response = await apiInstance.put(`/finance/wants/edit/${id}`, data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update wishlist!';
-    }
+  delete: async (id: number) => {
+    const response = await apiInstance.delete(`/finance/wants/delete/${id}`);
+    return response.data;
+  },
+};
+
+export const savingService = {
+  getAll: async () => {
+    const response = await apiInstance.get('/finance/goal/all');
+    return response.data;
   },
 
-  deleteWant: async (id: number) => {
-    try {
-      const response = await apiInstance.delete(`/finance/wants/delete/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus data!';
-    }
-  },
-  addSavingGoal: async (data: SavingRequest): Promise<SavingResponse> => {
-    try {
-      const response = await apiInstance.post<SavingResponse>('/finance/goal', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal bikin target tabungan!';
-    }
+  getById: async (id: number) => {
+    const response = await apiInstance.get(`/finance/goal/${id}`);
+    return response.data;
   },
 
-  getSavingGoals: async () => {
-    try {
-      const response = await apiInstance.get('/finance/goal/all');
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal ambil data tabungan!';
-    }
+  add: async (data: SavingRequest) => {
+    const response = await apiInstance.post('/finance/goal', data);
+    return response.data;
   },
 
-  getSavingGoalById: async (id: number) => {
-    try {
-      const response = await apiInstance.get(`/finance/goal/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Data tabungan nggak ketemu!';
-    }
+  edit: async (id: number, data: SavingRequest) => {
+    const response = await apiInstance.put(`/finance/goal/edit/${id}`, data);
+    return response.data;
   },
 
-  updateSavingGoal: async (id: number, data: Partial<SavingRequest>) => {
-    try {
-      const response = await apiInstance.put(`/finance/goal/edit/${id}`, data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal update tabungan!';
-    }
+  topup: async (id: number, data: TopupRequest) => {
+    const response = await apiInstance.post(`/finance/goal/${id}/topup`, data);
+    return response.data;
   },
 
-  deleteSavingGoal: async (id: number) => {
-    try {
-      const response = await apiInstance.delete(`/finance/goal/delete/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal hapus data!';
-    }
+  delete: async (id: number) => {
+    const response = await apiInstance.delete(`/finance/goal/delete/${id}`);
+    return response.data;
   },
-  
-  addBudgetAssistance: async (data: BudgetAssistanceRequest): Promise<BudgetAssistanceResponse> => {
-    try {
-      const response = await apiInstance.post<BudgetAssistanceResponse>('/finance/generate', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal bikin rencana anggaran nih!';
-    }
-  },
+};
 
+export const aiFinanceService = {
   scanMutasi: async (file: File): Promise<ScanMutasiResponse> => {
-    try {
-      const formData = new FormData();
-      formData.append('mutasi_rekening', file);
+    const formData = new FormData();
+    formData.append('mutasi_rekening', file);
+    
+    const response = await apiInstance.post('/finance/scan/mutasi', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
 
-      const response = await apiInstance.post<ScanMutasiResponse>('/finance/scan/mutasi', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.message || 'Gagal nganalisis foto mutasi lu, coba pastiin fotonya jelas ya!';
-    }
-  }
+  generateBudget: async (data: BudgetAssistanceRequest): Promise<BudgetAssistanceResponse> => {
+    const response = await apiInstance.post('/finance/generate', data);
+    return response.data;
+  },
+};
+
+export default {
+  income: incomeService,
+  expense: expenseService,
+  wants: wantsService,
+  saving: savingService,
+  ai: aiFinanceService,
 };

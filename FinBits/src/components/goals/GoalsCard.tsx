@@ -1,9 +1,9 @@
-// components/GoalsCard.tsx
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Calendar, Tag, Target, ArrowRight, Layers } from 'lucide-react';
 import EditGoalForm from './EditGoals';
 import ViewRoadmapModal from './ViewRoadmapModal';
 import DeleteGoals from './DeleteGoals';
+import { COLOR_CLASSES } from '../../constants/colors';
 
 interface GoalData {
   id: number;
@@ -46,13 +46,11 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goalData, onUpdate, onDelete }) =
     });
   };
 
-  // Fungsi untuk menangani klik tombol Edit dan mencegah event bubbling
   const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Mencegah event bubbling ke parent
+    e.stopPropagation();
     setShowEditModal(true);
   };
 
-  // Fungsi untuk tombol lainnya juga
   const handleViewRoadmapClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowRoadmapModal(true);
@@ -65,93 +63,83 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goalData, onUpdate, onDelete }) =
 
   return (
     <>
-      <div className="w-full text-gray-300 rounded-xl p-6 shadow-2xl border border-gray-800 bg-[#1a1a1a] relative">
+      <div className={`group w-full  backdrop-blur-sm border border-slate-800 rounded-[1.5rem] p-6 shadow-xl ${COLOR_CLASSES.secondary.hover} transition-all duration-300 relative overflow-hidden`}>
         
-        {/* Delete Button */}
-        <button 
-          onClick={handleDeleteClick}
-          className="absolute top-4 right-4 p-2 text-gray-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-          title="Delete Goal"
-        >
-          <Trash2 size={16} />
-        </button>
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors"></div>
+
+        <div className="flex justify-between items-start mb-4 relative z-10">
+          <div className={`flex items-center gap-2 px-3 py-1 ${COLOR_CLASSES.secondary.bgLight} border ${COLOR_CLASSES.secondary.borderLight} rounded-full`}>
+            <Tag size={12} className={COLOR_CLASSES.secondary.text} />
+            <span className={`text-[10px] font-bold uppercase tracking-widest ${COLOR_CLASSES.secondary.text}`}>{goalData.category}</span>
+          </div>
+          
+          <button 
+            onClick={handleDeleteClick}
+            className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
+            title="Delete Goal"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
         
-        {/* Title dengan Progress Bar */}
-        <div className="mb-6 pr-10">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="mb-6">
+          <h2 className={`text-2xl font-extrabold text-white mb-4 group-hover:${COLOR_CLASSES.secondary.text} transition-colors`}>
             {goalData.name}
           </h2>
           
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-400">Progress</span>
-              <span className="text-[#10B981] font-bold">{goalData.progress}%</span>
+          <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800/50">
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-tighter">Progres Saat Ini</span>
+              <span className={`text-lg font-black ${COLOR_CLASSES.secondary.text}`}>{goalData.progress}%</span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
+            <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
               <div 
-                className="bg-[#10B981] h-2 rounded-full transition-all duration-300"
+                className={`bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(59,130,246,0.4)]`}
                 style={{ width: `${goalData.progress}%` }}
               ></div>
             </div>
           </div>
         </div>
 
-        {/* Info Section */}
-        <div className="space-y-5 mb-8">
-          <div className="flex justify-between items-center py-2 border-b border-gray-800">
-            <span className="text-gray-500">Category:</span>
-            <span className="text-white font-medium">{goalData.category}</span>
-          </div>
-
-          <div className="py-2 border-b border-gray-800">
-            <p className="text-gray-500 mb-2">Outcome:</p>
-            <p className="text-white italic bg-gray-900/30 p-3 rounded-lg">
-              {goalData.outcome}
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center py-2 border-b border-gray-800">
-            <span className="text-gray-500">Why:</span>
-            <span className="text-white italic">{goalData.why}</span>
-          </div>
-
-          <div className="flex justify-between items-center py-2 border-b border-gray-800">
-            <span className="text-gray-500">Deadline:</span>
-            <span className="text-white font-medium">{formatDate(goalData.deadline)}</span>
-          </div>
-
-          {goalData.roadmapImage && (
-            <div className="pt-2">
-              <p className="text-gray-500 mb-2">Roadmap Available:</p>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center">
-                  📊
-                </div>
-                <span className="text-sm text-gray-300">Click "View Roadmap" to see details</span>
-              </div>
+        <div className="space-y-4 mb-8">
+          <div className="flex items-start gap-3">
+            <div className="mt-1 p-1.5 bg-slate-800 rounded-lg text-slate-400">
+              <Target size={14} />
             </div>
-          )}
+            <div>
+              <p className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Hasil yang Diharapkan</p>
+              <p className="text-sm text-slate-200 leading-relaxed italic">"{goalData.outcome}"</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-3 bg-slate-900/30 rounded-xl border border-slate-800/50">
+            <div className="flex items-center gap-2 text-slate-400">
+              <Calendar size={14} />
+              <span className="text-xs font-medium">Batas Waktu</span>
+            </div>
+            <span className="text-xs font-bold text-slate-200">{formatDate(goalData.deadline)}</span>
+          </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 relative z-10">
           <button 
             onClick={handleViewRoadmapClick}
-            className="flex-1 py-3 px-4 rounded-lg border border-gray-700 bg-transparent hover:bg-gray-800 hover:border-[#10B981] transition-all font-medium text-white flex items-center justify-center gap-2"
+            className="flex-[2] py-3 px-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 border border-slate-700 transition-all text-xs font-bold flex items-center justify-center gap-2 group/btn"
           >
-            <span>View Roadmap</span>
+            <Layers size={16} className="text-emerald-400" />
+            <span>Lihat Roadmap</span>
           </button>
+          
           <button 
-            onClick={handleEditClick} // Menggunakan handler baru
-            className="flex-1 py-3 px-4 rounded-lg border border-gray-700 bg-transparent hover:bg-gray-800 hover:border-[#599EFF] transition-all font-medium text-white flex items-center justify-center gap-2"
+            onClick={handleEditClick}
+            className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 transition-all text-xs font-bold flex items-center justify-center gap-2"
           >
             <span>Edit</span>
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
 
-      {/* Edit Goal Modal */}
       {showEditModal && (
         <EditGoalForm 
           onClose={() => setShowEditModal(false)}
@@ -160,7 +148,6 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goalData, onUpdate, onDelete }) =
         />
       )}
 
-      {/* View Roadmap Modal */}
       {showRoadmapModal && (
         <ViewRoadmapModal 
           onClose={() => setShowRoadmapModal(false)}
@@ -168,7 +155,6 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goalData, onUpdate, onDelete }) =
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <DeleteGoals 
           isOpen={showDeleteModal}
