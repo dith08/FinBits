@@ -65,7 +65,7 @@ export const BudgetAssistant = () => {
           daily_snack_limit: roundToThousand(raw.daily_snack_limit),
           estimated_balance_30_days: roundToThousand(raw.estimated_balance_30_days),
         };
-        
+
         setBudgetResult(roundedData);
       } else {
         setError(response.message || "Gagal generate budget nih.");
@@ -78,28 +78,28 @@ export const BudgetAssistant = () => {
   };
 
   const cardsData = [
-    { 
-      title: "Needs", 
-      icon: <Wallet className="text-emerald-400" />, 
-      amount: budgetResult?.needs_amount, 
+    {
+      title: "Needs",
+      icon: <Wallet className="text-emerald-400" />,
+      amount: budgetResult?.needs_amount,
       note: budgetResult?.needs_note || "Budget buat makan & kewajiban utama kamu."
     },
-    { 
-      title: "Wants", 
-      icon: <ShoppingBag className="text-pink-400" />, 
-      amount: budgetResult?.wants_amount, 
+    {
+      title: "Wants",
+      icon: <ShoppingBag className="text-pink-400" />,
+      amount: budgetResult?.wants_amount,
       note: budgetResult?.wants_note || "Buat seneng-seneng tapi tetep terkontrol."
     },
-    { 
-      title: "Saving", 
-      icon: <PiggyBank className="text-amber-400" />, 
-      amount: budgetResult?.saving_amount, 
+    {
+      title: "Saving",
+      icon: <PiggyBank className="text-amber-400" />,
+      amount: budgetResult?.saving_amount,
       note: budgetResult?.saving_note || "Tabungan biar masa depan gak suram."
     },
-    { 
-      title: "Daily Limit", 
-      icon: <Coffee className="text-cyan-400" />, 
-      amount: budgetResult?.daily_snack_limit, 
+    {
+      title: "Daily Limit",
+      icon: <Coffee className="text-cyan-400" />,
+      amount: budgetResult?.daily_snack_limit,
       note: budgetResult ? "Batas maksimal jajan per hari biar gak boncos." : "Limit jajan harian bakal diitungin AI."
     },
   ];
@@ -108,7 +108,7 @@ export const BudgetAssistant = () => {
     <div className="max-w-6xl mx-auto p-4 sm:p-8 rounded-[2rem] border border-slate-800 shadow-2xl text-slate-200">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-md md:text-3xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             Budget Assistant AI
           </h1>
           <p className="text-slate-400 text-sm mt-1">Atur duit kamu pake AI, biar gak jajan mulu.</p>
@@ -163,13 +163,12 @@ export const BudgetAssistant = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         {cardsData.map((card, i) => (
-          <div 
-            key={i} 
-            className={`group p-6 rounded-2xl border transition-all duration-300 ${
-              budgetResult 
-              ? 'bg-slate-800/40 border-slate-700 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]' 
+          <div
+            key={i}
+            className={`group p-6 rounded-2xl border transition-all duration-300 ${budgetResult
+              ? 'bg-slate-800/40 border-slate-700 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]'
               : 'bg-slate-900/20 border-slate-800 opacity-60'
-            }`}
+              }`}
           >
             <div className="p-2 w-fit rounded-lg bg-slate-900 mb-4 group-hover:scale-110 transition-transform">
               {card.icon}
@@ -193,7 +192,7 @@ export const BudgetAssistant = () => {
           <div>
             <h4 className="text-sm font-bold text-slate-200">AI Analysis Note</h4>
             <div className="text-xs text-slate-400 mt-1 max-w-md leading-relaxed">
-              {budgetResult 
+              {budgetResult
                 ? (
                   <p>
                     {budgetResult.general_note}. Estimasi sisa saldo kamu setelah 30 hari itu sekitar <span className="text-emerald-400 font-bold">{formatIDR(budgetResult.estimated_balance_30_days)}</span>.
@@ -208,14 +207,17 @@ export const BudgetAssistant = () => {
         <button
           onClick={handleGenerate}
           disabled={loading || !income}
-          className="relative overflow-hidden group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 text-slate-950 font-bold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-emerald-500/20 disabled:cursor-not-allowed"
+          className="relative overflow-hidden group flex items-center justify-center gap-2 sm:gap-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 text-slate-950 font-bold px-4 sm:px-8 py-3.5 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-emerald-500/20 disabled:cursor-not-allowed w-full sm:w-auto"
         >
           {loading ? (
-            <Loader2 className="animate-spin" size={20} />
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={18} />
+              <span className="text-sm sm:text-base">Generating...</span>
+            </div>
           ) : (
             <>
-              <span>Generate With AI</span>
-              <Sparkles size={20} className="fill-current" />
+              <span className="text-sm sm:text-base uppercase tracking-tight">Generate With AI</span>
+              <Sparkles size={18} className="fill-current shrink-0" />
             </>
           )}
         </button>

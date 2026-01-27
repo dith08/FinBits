@@ -29,23 +29,23 @@ const parseTimeFromNote = (note?: string): string | null => {
 
 const canResetHabit = (completedAt?: string): boolean => {
   if (!completedAt) return true;
-  
+
   const completedDate = new Date(completedAt);
   const nextReset = new Date(completedDate);
   nextReset.setDate(nextReset.getDate() + 1);
   nextReset.setHours(0, 0, 0, 0);
-  
+
   return new Date() >= nextReset;
 };
 
 const getTimeUntilReset = (completedAt?: string): string => {
   if (!completedAt) return '';
-  
+
   const completedDate = new Date(completedAt);
   const nextReset = new Date(completedDate);
   nextReset.setDate(nextReset.getDate() + 1);
   nextReset.setHours(0, 0, 0, 0);
-  
+
   const remaining = nextReset.getTime() - Date.now();
   if (remaining <= 0) return '';
   const hours = Math.floor(remaining / (1000 * 60 * 60));
@@ -140,7 +140,7 @@ const HabitsList = () => {
 
   const toggleCheck = async (id: number) => {
     if (actionMode !== 'none') return;
-    
+
     const habit = habits.find(h => h.habit_id === id);
     if (!habit) return;
 
@@ -277,32 +277,45 @@ const HabitsList = () => {
     <div className="text-white p-8 font-sans">
       <div className="space-y-4">
         {actionMode !== 'none' && (
-          <div className={`p-3 ${COLOR_CLASSES.accent.bgLight} border ${COLOR_CLASSES.accent.borderLight} rounded-lg flex items-center justify-between`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${actionMode === 'edit' ? COLOR_CLASSES.accent.bg : 'bg-red-600'}`}>
+          <div className={`p-3 ${COLOR_CLASSES.accent.bgLight} border ${COLOR_CLASSES.accent.borderLight} rounded-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4`}>
+
+            <div className="flex items-start gap-3 min-w-0 w-full md:w-auto">
+              <div className={`w-6 h-6 rounded-full flex shrink-0 items-center justify-center mt-0.5 md:mt-0 ${actionMode === 'edit' ? COLOR_CLASSES.accent.bg : 'bg-red-600'}`}>
                 {actionMode === 'edit' ? <Edit className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
               </div>
-              <span className="text-sm">
-                {actionMode === 'edit' ? 'Pilih 1 kebiasaan yang akan diedit' : `Pilih kebiasaan yang akan dihapus (${selectedCount} dipilih)`}
+
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs sm:text-sm font-medium">
+                  {actionMode === 'edit'
+                    ? 'Pilih 1 kebiasaan buat diedit'
+                    : `Hapus kebiasaan (${selectedCount} dipilih)`}
+                </span>
+
                 {selectedCount > 0 && (
-                  <span className="ml-2 text-emerald-400">
+                  <span className="text-[11px] sm:text-xs text-emerald-400 truncate">
                     • {selectedHabitsForAction.map(h => h.habit_name).join(', ')}
                   </span>
                 )}
-              </span>
+              </div>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex gap-2 w-full md:w-auto justify-end shrink-0">
               {actionMode === 'delete' && (
                 <button
                   onClick={() => {
                     setHabits(prev => prev.map(h => ({ ...h, isSelected: true })));
                   }}
-                  className={`text-xs px-3 py-1 ${COLOR_CLASSES.accent.bg} hover:bg-cyan-600 rounded transition-colors`}
+                  className={`flex-1 md:flex-none text-[11px] sm:text-xs px-3 py-2 md:py-1 ${COLOR_CLASSES.accent.bg} hover:bg-cyan-600 rounded transition-colors whitespace-nowrap font-medium`}
                 >
                   Pilih Semua
                 </button>
               )}
-              <button onClick={exitActionMode} className="text-xs px-3 py-1 bg-red-900/30 border border-red-700 rounded hover:bg-red-800/30">Batal</button>
+              <button
+                onClick={exitActionMode}
+                className="flex-1 md:flex-none text-[11px] sm:text-xs px-3 py-2 md:py-1 bg-red-900/30 border border-red-700 rounded hover:bg-red-800/30 transition-colors font-medium"
+              >
+                Batal
+              </button>
             </div>
           </div>
         )}
@@ -316,33 +329,31 @@ const HabitsList = () => {
             const canReset = canResetHabit(habit.completedAt);
             const timeUntilReset = getTimeUntilReset(habit.completedAt);
             const displayTime = parseTimeFromNote(habit.note);
-            
+
             return (
               <div key={habit.habit_id} className="space-y-2">
-                <div className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${
-                  habit.isSelected 
-                    ? actionMode === 'edit' ? `${COLOR_CLASSES.accent.border} ${COLOR_CLASSES.accent.bgLight}` : 'border-red-500 bg-red-900/10'
-                    : 'bg-[#1e1e1e] border-gray-700 hover:border-cyan-500/50'
-                }`}>
+                <div className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${habit.isSelected
+                  ? actionMode === 'edit' ? `${COLOR_CLASSES.accent.border} ${COLOR_CLASSES.accent.bgLight}` : 'border-red-500 bg-red-900/10'
+                  : 'bg-[#1e1e1e] border-gray-700 hover:border-cyan-500/50'
+                  }`}>
                   <div className="flex items-center gap-3 flex-1">
                     {actionMode !== 'none' && (
                       <button
                         onClick={() => handleSelectHabit(habit.habit_id)}
-                        className={`w-5 h-5 border rounded flex items-center justify-center transition-colors ${
-                          habit.isSelected 
-                            ? actionMode === 'edit' ? `${COLOR_CLASSES.accent.bg} ${COLOR_CLASSES.accent.border}` : 'bg-red-500 border-red-500'
-                            : 'border-gray-500 hover:border-cyan-500'
-                        }`}
+                        className={`w-5 h-5 border rounded flex items-center justify-center transition-colors ${habit.isSelected
+                          ? actionMode === 'edit' ? `${COLOR_CLASSES.accent.bg} ${COLOR_CLASSES.accent.border}` : 'bg-red-500 border-red-500'
+                          : 'border-gray-500 hover:border-cyan-500'
+                          }`}
                       >
                         {habit.isSelected && <Check className="w-3 h-3 text-white" />}
                       </button>
                     )}
-                    
+
                     <div className="cursor-pointer flex-1 flex items-center gap-3" onClick={() => toggleOpen(habit.habit_id)}>
                       <span className={`text-lg transition-all ${habit.completed ? 'text-gray-500 line-through' : ''}`}>
                         {habit.habit_name}
                       </span>
-                      
+
                       {/* Time from note display */}
                       {displayTime && (
                         <span className="flex items-center gap-1 text-xs text-gray-500">
@@ -350,24 +361,23 @@ const HabitsList = () => {
                           {displayTime}
                         </span>
                       )}
-                      
+
                       {/* Cooldown indicator */}
                       {habit.completed && !canReset && timeUntilReset && (
                         <span className="text-xs text-amber-500 bg-amber-900/20 px-2 py-0.5 rounded">
                           Reset: {timeUntilReset}
                         </span>
                       )}
-                      
+
                       {habit.isSelected && actionMode !== 'none' && (
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          actionMode === 'edit' ? `${COLOR_CLASSES.accent.bgLight} border ${COLOR_CLASSES.accent.borderLight}` : 'bg-red-900/30 border border-red-700'
-                        }`}>
+                        <span className={`text-xs px-2 py-1 rounded ${actionMode === 'edit' ? `${COLOR_CLASSES.accent.bgLight} border ${COLOR_CLASSES.accent.borderLight}` : 'bg-red-900/30 border border-red-700'
+                          }`}>
                           {actionMode === 'edit' ? 'Akan Diedit' : 'Akan Dihapus'}
                         </span>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-4">
                     {actionMode === 'none' && (
                       <button
@@ -379,9 +389,9 @@ const HabitsList = () => {
                         {habit.completed && <Check className="w-3 h-3 text-white" />}
                       </button>
                     )}
-                    <ChevronDown 
+                    <ChevronDown
                       onClick={() => toggleOpen(habit.habit_id)}
-                      className={`w-6 h-6 cursor-pointer transition-transform ${habit.isOpen ? 'rotate-180' : ''} ${actionMode !== 'none' ? 'opacity-50' : ''}`} 
+                      className={`w-6 h-6 cursor-pointer transition-transform ${habit.isOpen ? 'rotate-180' : ''} ${actionMode !== 'none' ? 'opacity-50' : ''}`}
                     />
                   </div>
                 </div>
@@ -389,14 +399,14 @@ const HabitsList = () => {
                 {habit.isOpen && actionMode === 'none' && (
                   <div className="p-5 bg-[#121212] border border-gray-700 rounded-xl mx-1 text-sm grid grid-cols-2 gap-y-4">
                     <div className="space-y-3">
-                      <p><span className="text-gray-400">Kebiasaan :</span> <br/> {habit.habit_name}</p>
-                      <p><span className="text-gray-400">Frekuensi :</span> <br/> {habit.frequency}</p>
-                      <p><span className="text-gray-400">Kategori :</span> <br/> {habit.category}</p>
+                      <p><span className="text-gray-400">Kebiasaan :</span> <br /> {habit.habit_name}</p>
+                      <p><span className="text-gray-400">Frekuensi :</span> <br /> {habit.frequency}</p>
+                      <p><span className="text-gray-400">Kategori :</span> <br /> {habit.category}</p>
                     </div>
                     <div className="space-y-3 text-right">
-                      <p><span className="text-gray-400">Pengingat :</span> <br/> {habit.reminder_time || '-'}</p>
-                      <p><span className="text-gray-400">Target :</span> <br/> {habit.progress_target}%</p>
-                      <p><span className="text-gray-400">Catatan :</span> <br/> {habit.note || '-'}</p>
+                      <p><span className="text-gray-400">Pengingat :</span> <br /> {habit.reminder_time || '-'}</p>
+                      <p><span className="text-gray-400">Target :</span> <br /> {habit.progress_target}%</p>
+                      <p><span className="text-gray-400">Catatan :</span> <br /> {habit.note || '-'}</p>
                     </div>
                   </div>
                 )}
@@ -405,28 +415,44 @@ const HabitsList = () => {
           })
         )}
 
-        <div className="grid grid-cols-2 gap-4 mt-12">
-          <button onClick={() => setShowAIModal(true)} disabled={actionMode !== 'none'}
-            className="flex items-center justify-center gap-2 bg-[#1e1e1e] border border-gray-700 p-3 rounded-lg text-xs font-medium hover:bg-[#252525] hover:border-emerald-500 transition-all group disabled:opacity-50">
-            Tambah Kebiasaan AI <Sparkles className="w-4 h-4 text-emerald-400 group-hover:scale-110" />
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 mt-12">
+          <button
+            onClick={() => setShowAIModal(true)}
+            disabled={actionMode !== 'none'}
+            className="flex items-center justify-center gap-2 bg-[#1e1e1e] border border-gray-700 p-3 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-[#252525] hover:border-emerald-500 transition-all group disabled:opacity-50"
+          >
+            <span className="truncate">Tambah Kebiasaan AI</span>
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 shrink-0" />
           </button>
-          <button onClick={() => setShowAddModal(true)} disabled={actionMode !== 'none'}
-            className="bg-[#1e1e1e] border border-gray-700 p-3 rounded-lg text-xs font-medium hover:bg-[#252525] hover:border-emerald-500 transition-colors disabled:opacity-50">
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            disabled={actionMode !== 'none'}
+            className="bg-[#1e1e1e] border border-gray-700 p-3 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-[#252525] hover:border-emerald-500 transition-colors disabled:opacity-50 truncate"
+          >
             Tambah Kebiasaan
           </button>
-          <button onClick={() => handleActionClick('edit')}
-            className={`flex items-center justify-center gap-2 border p-3 rounded-lg text-xs font-medium transition-colors ${
-              actionMode === 'edit' ? `${COLOR_CLASSES.accent.bgLight} ${COLOR_CLASSES.accent.border}` : 'bg-[#1e1e1e] border-gray-700 hover:border-cyan-500'
-            }`}>
-            <Edit className="w-4 h-4" />
-            {actionMode === 'edit' && selectedCount > 0 ? 'Edit Terpilih' : 'Edit Kebiasaan'}
+
+          <button
+            onClick={() => handleActionClick('edit')}
+            className={`flex items-center justify-center gap-2 border p-3 rounded-lg text-[11px] sm:text-xs font-medium transition-colors ${actionMode === 'edit' ? `${COLOR_CLASSES.accent.bgLight} ${COLOR_CLASSES.accent.border}` : 'bg-[#1e1e1e] border-gray-700 hover:border-cyan-500'
+              }`}
+          >
+            <Edit className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {actionMode === 'edit' && selectedCount > 0 ? 'Edit Terpilih' : 'Edit Kebiasaan'}
+            </span>
           </button>
-          <button onClick={() => handleActionClick('delete')}
-            className={`flex items-center justify-center gap-2 border p-3 rounded-lg text-xs font-medium transition-colors ${
-              actionMode === 'delete' ? 'bg-red-900/30 border-red-500' : 'bg-[#1e1e1e] border-gray-700 hover:border-red-500'
-            }`}>
-            <Trash2 className="w-4 h-4" />
-            {actionMode === 'delete' && selectedCount > 0 ? `Hapus (${selectedCount})` : 'Hapus Kebiasaan'}
+
+          <button
+            onClick={() => handleActionClick('delete')}
+            className={`flex items-center justify-center gap-2 border p-3 rounded-lg text-[11px] sm:text-xs font-medium transition-colors ${actionMode === 'delete' ? 'bg-red-900/30 border-red-500' : 'bg-[#1e1e1e] border-gray-700 hover:border-red-500'
+              }`}
+          >
+            <Trash2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {actionMode === 'delete' && selectedCount > 0 ? `Hapus (${selectedCount})` : 'Hapus Kebiasaan'}
+            </span>
           </button>
         </div>
       </div>
@@ -437,9 +463,9 @@ const HabitsList = () => {
         <EditHabitModal habit={selectedHabit} onClose={() => { setShowEditModal(false); setSelectedHabit(null); }} onSave={handleEditSave} />
       )}
       {showDeleteModal && (
-        <DeleteHabitModal 
-          isOpen={showDeleteModal} 
-          onClose={() => { setShowDeleteModal(false); setSelectedHabit(null); setHabits(habits.map(h => ({ ...h, isSelected: false }))); }} 
+        <DeleteHabitModal
+          isOpen={showDeleteModal}
+          onClose={() => { setShowDeleteModal(false); setSelectedHabit(null); setHabits(habits.map(h => ({ ...h, isSelected: false }))); }}
           onConfirm={handleDeleteConfirm}
           count={selectedCount || 1}
         />

@@ -34,7 +34,7 @@ const getResetInfo = (completedAt?: string, note?: string) => {
 
   let resetDate = new Date(completedAt);
   resetDate.setDate(resetDate.getDate() + 1);
-  resetDate.setHours(0, 0, 0, 0); 
+  resetDate.setHours(0, 0, 0, 0);
 
   const diff = resetDate.getTime() - Date.now();
   const canReset = diff <= 0;
@@ -81,13 +81,12 @@ const TodoRow = ({
   return (
     <div className="relative space-y-2">
       <div
-        className={`flex items-center justify-between p-3 bg-[#1e1e1e] border rounded-lg transition-colors ${
-          todo.isSelected
-            ? actionMode === "edit"
-              ? "border-blue-500 bg-blue-900/10"
-              : "border-red-500 bg-red-900/10"
-            : "border-gray-700 hover:border-emerald-500/50"
-        }`}
+        className={`flex items-center justify-between p-3 bg-[#1e1e1e] border rounded-lg transition-colors ${todo.isSelected
+          ? actionMode === "edit"
+            ? "border-blue-500 bg-blue-900/10"
+            : "border-red-500 bg-red-900/10"
+          : "border-gray-700 hover:border-emerald-500/50"
+          }`}
       >
         <div className="flex items-center gap-3 flex-1">
           {actionMode !== "none" && (
@@ -148,11 +147,10 @@ const TodoRow = ({
                       <button
                         key={s}
                         onClick={() => handleStatusSelect(s)}
-                        className={`w-full text-left px-4 py-3 text-xs flex gap-3 items-center transition-colors ${
-                          todo.status === s
-                            ? "bg-gray-700 text-white"
-                            : "hover:bg-gray-800 text-gray-300"
-                        }`}
+                        className={`w-full text-left px-4 py-3 text-xs flex gap-3 items-center transition-colors ${todo.status === s
+                          ? "bg-gray-700 text-white"
+                          : "hover:bg-gray-800 text-gray-300"
+                          }`}
                       >
                         <div className={`w-3 h-3 rounded-full ${sColor.bg}`} />
                         <span className="font-medium">{s === "Pending" ? "Tertunda" : s === "In Progress" ? "Sedang Dikerjakan" : "Selesai"}</span>
@@ -328,18 +326,22 @@ const TodoApp = () => {
   return (
     <div className="text-white p-6 font-sans">
       {actionMode !== "none" && (
-        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg flex justify-between items-center">
-          <span className="text-sm flex gap-2 items-center">
+        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-3">
+
+          <span className="text-[12px] sm:text-sm flex gap-2 items-center font-medium">
             {actionMode === "edit" ? (
-              <Edit className="w-4" />
+              <Edit className="w-4 h-4 text-blue-400" />
             ) : (
-              <Trash2 className="w-4" />
+              <Trash2 className="w-4 h-4 text-red-400" />
             )}
-            {actionMode === "edit"
-              ? "Pilih 1 untuk edit"
-              : `${selectedCount} dipilih untuk hapus`}
+            <span className="leading-tight">
+              {actionMode === "edit"
+                ? "Pilih 1 item untuk edit"
+                : `${selectedCount} dipilih untuk hapus`}
+            </span>
           </span>
-          <div className="flex gap-2">
+
+          <div className="flex gap-2 w-full sm:w-auto justify-end">
             {actionMode === "delete" && (
               <button
                 onClick={() => {
@@ -347,7 +349,7 @@ const TodoApp = () => {
                     prev.map((t) => ({ ...t, isSelected: true }))
                   );
                 }}
-                className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded transition-colors"
+                className="flex-1 sm:flex-none text-[11px] sm:text-xs px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded transition-colors whitespace-nowrap"
               >
                 Pilih Semua
               </button>
@@ -357,7 +359,7 @@ const TodoApp = () => {
                 setActionMode("none");
                 setTodos((t) => t.map((x) => ({ ...x, isSelected: false })));
               }}
-              className="text-xs px-3 py-1 bg-red-900/50 rounded"
+              className="flex-1 sm:flex-none text-[11px] sm:text-xs px-3 py-1.5 bg-red-900/50 hover:bg-red-800 rounded transition-colors"
             >
               Batal
             </button>
@@ -388,19 +390,20 @@ const TodoApp = () => {
           ))
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-6">
           <button
             onClick={() => setModals({ ...modals, ai: true })}
             disabled={actionMode !== "none"}
-            className="btn-base border border-gray-700 py-2 rounded hover:border-emerald-500 flex justify-center gap-2 items-center text-xs md:text-sm font-medium"
+            className="btn-base border border-gray-700 py-2.5 px-2 rounded hover:border-emerald-500 flex justify-center gap-2 items-center text-[11px] sm:text-xs md:text-sm font-medium transition-all"
           >
-            Tambah To Do List AI <Sparkles className="w-3 text-emerald-400" />
+            <span className="truncate">Tambah To Do List AI</span>
+            <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" />
           </button>
 
           <button
             onClick={() => setModals({ ...modals, regular: true })}
             disabled={actionMode !== "none"}
-            className="btn-base border border-gray-700 py-2 rounded hover:border-emerald-500 text-xs md:text-sm font-medium"
+            className="btn-base border border-gray-700 py-2.5 px-2 rounded hover:border-emerald-500 text-[11px] sm:text-xs md:text-sm font-medium transition-all truncate"
           >
             Tambah To Do List
           </button>
@@ -410,7 +413,7 @@ const TodoApp = () => {
               setActionMode("edit");
               setTodos((t) => t.map((x) => ({ ...x, isSelected: false })));
             }}
-            className="border py-2 rounded border-gray-700 hover:border-blue-500 text-xs md:text-sm font-medium"
+            className="border border-gray-700 py-2.5 px-2 rounded hover:border-blue-500 text-[11px] sm:text-xs md:text-sm font-medium transition-all truncate"
           >
             Edit To Do List
           </button>
@@ -420,7 +423,7 @@ const TodoApp = () => {
               setActionMode("delete");
               setTodos((t) => t.map((x) => ({ ...x, isSelected: false })));
             }}
-            className="border py-2 rounded border-gray-700 hover:border-red-500 text-xs md:text-sm font-medium"
+            className="border border-gray-700 py-2.5 px-2 rounded hover:border-red-500 text-[11px] sm:text-xs md:text-sm font-medium transition-all truncate"
           >
             Hapus To Do List
           </button>

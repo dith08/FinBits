@@ -114,7 +114,7 @@ const IncomeCard: React.FC = () => {
         <div className="relative overflow-hidden bg-gradient-to-r from-gray-800/40 to-transparent p-4 rounded-2xl border border-gray-800/50 mb-6">
            <div className="relative z-10 flex justify-between items-center">
               <span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Saldo Bersih</span>
-              <span className="text-xl font-black text-white tracking-tight">
+              <span className="text-sm md:text-lg font-black text-white tracking-tight">
                 Rp. {total.toLocaleString('id-ID')}
               </span>
            </div>
@@ -124,13 +124,13 @@ const IncomeCard: React.FC = () => {
         <div className="flex gap-3">
           <button 
             onClick={() => setShowAddModal(true)}
-            className={`flex-[2] py-3 ${COLOR_CLASSES.primary.bg} hover:bg-emerald-600 text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-[0_4px_14px_0_rgba(0,184,148,0.39)] active:scale-95`}
+            className={`flex-[2] py-3 ${COLOR_CLASSES.primary.bg} hover:bg-emerald-600 text-white font-black text-[10px] md:text-xs uppercase tracking-widest rounded-xl transition-all shadow-[0_4px_14px_0_rgba(0,184,148,0.39)] active:scale-95`}
           >
             Tambah Pemasukan
           </button>
           <button 
             onClick={() => setShowDetailModal(true)}
-            className="flex-1 py-3 bg-gray-800/50 hover:bg-gray-800 text-gray-300 border border-gray-700 font-bold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95"
+            className="flex-1 py-3 bg-gray-800/50 hover:bg-gray-800 text-gray-300 border border-gray-700 font-bold text-[10px] md:text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95"
           >
             Statistik
           </button>

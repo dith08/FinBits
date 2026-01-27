@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, X, Upload, ShoppingBag, DollarSign } from 'lucide-react';
+import { Camera, X, Upload, ShoppingBag, DollarSign, AlertCircle } from 'lucide-react';
 import { AlertModal, ModalPortal } from '../common';
 
 interface AddWantsProps {
@@ -14,7 +14,13 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
     imageUrl: ''
   });
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ✅ Konstanta batas maksimal (sesuai DECIMAL(15,2))
+  const MAX_PRICE = 9999999999999.99;
+  const MIN_PRICE = 0.01;
+  const MAX_ITEM_NAME_LENGTH = 150;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -29,25 +35,52 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // ✅ Validasi panjang nama barang
+    if (name === 'name' && value.length > MAX_ITEM_NAME_LENGTH) {
+      setError(`Nama barang maksimal ${MAX_ITEM_NAME_LENGTH} karakter`);
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    setError(''); // Clear error saat input berubah
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\D/g, '');
+    
+    // ✅ Validasi batas maksimal harga
+    if (rawValue !== '') {
+      const numericValue = parseFloat(rawValue);
+      
+      if (numericValue > MAX_PRICE) {
+        setError(`Harga maksimal adalah Rp ${MAX_PRICE.toLocaleString('id-ID')}`);
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       price: rawValue
     }));
+    setError(''); // Clear error saat input berubah
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // ✅ Validasi ukuran file
       if (file.size > 5 * 1024 * 1024) { 
         setAlertMessage('File terlalu besar. Maksimal 5MB.');
+        return;
+      }
+
+      // ✅ Validasi tipe file
+      if (!file.type.startsWith('image/')) {
+        setAlertMessage('File harus berupa gambar (JPG, PNG, etc).');
         return;
       }
       
@@ -64,15 +97,62 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.price) {
-      onAdd(
-        formData.name, 
-        parseInt(formData.price), 
-        formData.imageUrl || 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=300',
-        fileInputRef.current?.files?.[0] || undefined
-      );
-      onClose();
+    setError('');
+
+    // ✅ Validasi nama barang
+    if (!formData.name.trim()) {
+      setError('Nama barang tidak boleh kosong');
+      return;
     }
+
+    if (formData.name.trim().length < 3) {
+      setError('Nama barang minimal 3 karakter');
+      return;
+    }
+
+    if (formData.name.length > MAX_ITEM_NAME_LENGTH) {
+      setError(`Nama barang maksimal ${MAX_ITEM_NAME_LENGTH} karakter`);
+      return;
+    }
+
+    // ✅ Validasi harga
+    if (!formData.price) {
+      setError('Harga tidak boleh kosong');
+      return;
+    }
+
+    const numericPrice = parseFloat(formData.price);
+
+    if (isNaN(numericPrice)) {
+      setError('Harga harus berupa angka valid');
+      return;
+    }
+
+    if (numericPrice < MIN_PRICE) {
+      setError(`Harga minimal adalah Rp ${MIN_PRICE.toLocaleString('id-ID')}`);
+      return;
+    }
+
+    if (numericPrice > MAX_PRICE) {
+      setError(`Harga maksimal adalah Rp ${MAX_PRICE.toLocaleString('id-ID')}`);
+      return;
+    }
+
+    // ✅ Validasi gambar (opsional tapi recommended)
+    const uploadedFile = fileInputRef.current?.files?.[0];
+    if (!uploadedFile && !formData.imageUrl) {
+      setError('Silakan upload gambar barang');
+      return;
+    }
+
+    // ✅ Submit data
+    onAdd(
+      formData.name.trim(), 
+      numericPrice, 
+      formData.imageUrl || 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=300',
+      uploadedFile || undefined
+    );
+    onClose();
   };
 
   return (
@@ -103,9 +183,19 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
           </div>
 
           <form className="p-6" onSubmit={handleSubmit}>
+            {/* ✅ Alert Error */}
+            {error && (
+              <div className="mb-5 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <AlertCircle size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-red-400 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-gray-300 font-medium text-sm mb-2">Foto Barang</label>
+                <label className="block text-gray-300 font-medium text-sm mb-2">
+                  Foto Barang <span className="text-red-400">*</span>
+                </label>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -135,7 +225,7 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
                       <span className="text-gray-400 text-sm font-medium">
                         Klik untuk upload foto
                         <br />
-                        <span className="text-xs text-gray-500">Max 5MB</span>
+                        <span className="text-xs text-gray-500">Max 5MB (JPG, PNG)</span>
                       </span>
                     </div>
                   )}
@@ -143,7 +233,9 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
               </div>
 
               <div>
-                <label className="block text-gray-300 font-medium text-sm mb-2">Nama Barang</label>
+                <label className="block text-gray-300 font-medium text-sm mb-2">
+                  Nama Barang <span className="text-red-400">*</span>
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -151,14 +243,18 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
                   onChange={handleInputChange}
                   className="w-full bg-[#1e1e1e] border border-gray-700 text-white rounded-xl p-3 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
                   placeholder="Contoh: Laptop ROG..."
+                  maxLength={MAX_ITEM_NAME_LENGTH}
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1.5">
+                  {formData.name.length}/{MAX_ITEM_NAME_LENGTH} karakter
+                </p>
               </div>
 
               <div>
                 <label className="block text-gray-300 font-medium text-sm flex items-center gap-2 mb-2">
                   <DollarSign className="w-4 h-4 text-blue-400" />
-                  Harga Barang
+                  Harga Barang <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
@@ -171,6 +267,9 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
                     required
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-1.5">
+                  Maksimal: Rp {MAX_PRICE.toLocaleString('id-ID')}
+                </p>
               </div>
             </div>
 
@@ -184,7 +283,7 @@ const AddWants: React.FC<AddWantsProps> = ({ onClose, onAdd }) => {
               </button>
               <button 
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30 active:scale-95"
               >
                 Add Wants
               </button>

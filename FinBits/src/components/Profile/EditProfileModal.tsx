@@ -70,7 +70,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       await onSave(formData);
       onClose();
     } catch {
-      // Error handled in parent
     } finally {
       setSaving(false);
     }
@@ -82,7 +81,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
   <div className="bg-zinc-900 border border-zinc-800 rounded-[2.5rem] w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
     
-    {/* Header - Dibuat lebih clean */}
     <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-800/50 bg-zinc-900/50">
       <div>
         <h2 className="text-2xl font-bold text-white tracking-tight">Edit Profil</h2>
@@ -99,7 +97,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
         
-        {/* Left Column: Avatar & Basic Info (4 Cols) */}
         <div className="md:col-span-5 p-8 bg-zinc-800/20 border-r border-zinc-800/50 space-y-8">
           <div className="flex flex-col items-center group">
             <div className="relative">
@@ -155,7 +152,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Skills & Others (7 Cols) */}
         <div className="md:col-span-7 p-8 space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="space-y-4">
@@ -220,7 +216,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         </div>
       </div>
 
-      {/* Footer Actions */}
       <div className="p-8 bg-zinc-900/80 border-t border-zinc-800/50 backdrop-blur-md sticky bottom-0 flex gap-3 justify-end">
         <button
           type="button"

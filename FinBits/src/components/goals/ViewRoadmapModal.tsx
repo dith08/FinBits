@@ -55,9 +55,9 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
       try {
         const aiRes = await roadmapsAIService.get(goalData.id);
         console.log('AI Roadmap response:', aiRes);
-        
+
         const data = aiRes || aiRes;
-        
+
         if (data && Array.isArray(data)) {
           const steps: RoadmapStep[] = data.map((item: Record<string, unknown>, index: number) => ({
             id: Number(item.id || item.step_id) || index + 1,
@@ -149,12 +149,12 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 overflow-y-auto"
       onClick={handleBackdropClick}
     >
       <div className="w-full max-w-lg bg-[#121212] rounded-xl p-6 shadow-2xl border border-gray-800 relative my-4 max-h-[90vh] overflow-y-auto">
-        
+
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-lg font-bold text-white mb-1">
@@ -166,10 +166,10 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
               <span>Deadline: {goalData.deadline}</span>
             </div>
           </div>
-          
+
           <div className="flex gap-1">
             {roadmapImage && (
-              <button 
+              <button
                 onClick={handleDownload}
                 className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded transition-colors"
                 title="Download"
@@ -177,7 +177,7 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
                 <Download size={16} className="text-gray-300" />
               </button>
             )}
-            <button 
+            <button
               onClick={onClose}
               className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded transition-colors"
             >
@@ -193,7 +193,7 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
               <span className="text-[#10B981] font-bold">{goalData.progress}%</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
-              <div 
+              <div
                 className="bg-[#10B981] h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${goalData.progress}%` }}
               ></div>
@@ -236,13 +236,13 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
                   <RefreshCw size={14} className="text-gray-400" />
                 </button>
               </div>
-              
+
               {aiSteps.length > 0 ? (
                 <div className="space-y-2">
                   {aiSteps.map((step) => {
                     const isExpanded = expandedWeeks.has(step.id);
                     return (
-                      <div 
+                      <div
                         key={step.id}
                         className={`rounded-lg border ${step.completed ? 'border-[#10B981]/50 bg-[#10B981]/10' : 'border-gray-700 bg-gray-800/50'}`}
                       >
@@ -253,12 +253,12 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
                           <span className={`text-sm font-medium ${step.completed ? 'text-[#10B981]' : 'text-gray-300'}`}>
                             Week {step.week}
                           </span>
-                          <ChevronDown 
-                            size={16} 
+                          <ChevronDown
+                            size={16}
                             className={`text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                           />
                         </button>
-                        
+
                         {isExpanded && (
                           <div className="px-3 pb-3 pt-1">
                             <p className={`text-sm ${step.completed ? 'text-gray-300 line-through' : 'text-white'}`}>
@@ -283,10 +283,10 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-sm font-semibold text-white">Roadmap Image</h3>
                 </div>
-                
+
                 <div className="w-full max-h-64 bg-black rounded overflow-auto flex items-center justify-center p-2">
-                  <img 
-                    src={roadmapImage} 
+                  <img
+                    src={roadmapImage}
                     alt={`${goalData.name} roadmap`}
                     className="max-w-full max-h-full object-contain"
                   />
@@ -297,24 +297,26 @@ const ViewRoadmapModal: React.FC<ViewRoadmapModalProps> = ({ onClose, goalData }
         )}
 
         <div className="flex gap-2 mt-6">
-          <button 
+          <button
             onClick={handleGenerateAI}
             disabled={generatingAI}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-4 py-2 rounded text-sm font-medium transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-4 py-2.5 rounded text-[11px] sm:text-sm font-bold transition-all disabled:opacity-50 active:scale-95 min-h-[40px]"
           >
             {generatingAI ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
-                Generating...
+                <Loader2 size={14} className="animate-spin shrink-0" />
+                <span className="truncate">Generating...</span>
               </>
             ) : (
               <>
-                <Sparkles size={14} />
-                {aiSteps.length > 0 ? 'Buat Roadmap AI' : 'Buat AI Roadmap'}
+                <Sparkles size={14} className="shrink-0" />
+                <span className="truncate uppercase tracking-tight">
+                  {aiSteps.length > 0 ? 'Roadmap Ai' : 'Buat Roadmap'}
+                </span>
               </>
             )}
           </button>
-          <button 
+          <button
             onClick={onClose}
             className="flex-1 border border-gray-600 text-gray-300 hover:bg-gray-800 px-4 py-2 rounded text-sm font-medium transition-all"
           >

@@ -25,7 +25,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedGoalId, setSelectedGoalId] = useState<number | undefined>(undefined);
-  
+
   const [skillData, setSkillData] = useState<SkillData>({
     id: 0,
     mainSkill: "",
@@ -41,12 +41,12 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
       setLoading(true);
       const response = await skillsService.getAll();
       console.log('Skills data:', response);
-      
+
       if (response.length > 0) {
         const firstSkill = response[0];
         const skillId = Number(firstSkill.skill_id || firstSkill.id) || 0;
         setSelectedGoalId(skillId);
-        
+
         setSkillData({
           id: skillId,
           mainSkill: String(firstSkill.main_skill || 'No Skill'),
@@ -88,7 +88,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
   if (showAddForm) {
     return (
       <div className="w-full border border-gray-800 rounded-2xl shadow-2xl">
-        <AddMySkill 
+        <AddMySkill
           onClose={() => setShowAddForm(false)}
           onAdd={handleAddSkill}
         />
@@ -99,7 +99,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
   if (showEditForm) {
     return (
       <div className="w-full border border-gray-800 rounded-2xl shadow-2xl">
-        <EditMySkill 
+        <EditMySkill
           onClose={() => setShowEditForm(false)}
           onSave={handleUpdateSkill}
           initialData={skillData}
@@ -130,11 +130,12 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
                   </h2>
                   <p className="text-slate-500 text-xs mt-1 font-medium italic">Monitor perkembangan Kamu di sini.</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowAddForm(true)}
-                  className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl hover:bg-emerald-500 hover:text-slate-900 transition-all"
+                  className="px-3 sm:px-4 py-2.5 sm:py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] sm:text-xs font-bold rounded-xl hover:bg-emerald-500 hover:text-slate-900 transition-all active:scale-95 whitespace-nowrap flex items-center justify-center gap-1"
                 >
-                  + Tambah Baru
+                  <span className="text-sm">+</span>
+                  <span>Tambah Baru</span>
                 </button>
               </div>
 
@@ -160,7 +161,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
                         <span className="text-emerald-400">{skillData.skillProgress}%</span>
                       </div>
                       <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                           style={{ width: `${skillData.skillProgress}%` }}
                         />
@@ -209,7 +210,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
                     <p className="text-slate-300 font-bold">Kosong Melompong</p>
                     <p className="text-xs text-slate-500 max-w-[200px]">Mending Kamu tambahin Skill sekarang biar masa depan makin cerah.</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowAddForm(true)}
                     className="mt-4 text-sm font-black text-emerald-500 hover:text-emerald-400 underline underline-offset-8"
                   >
@@ -221,15 +222,15 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
 
             {skillData.mainSkill && (
               <div className="grid grid-cols-2 gap-4 mt-8 relative z-10">
-                <button 
+                <button
                   onClick={() => setShowEditForm(true)}
                   className="py-4 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-all text-xs border border-slate-700"
                 >
                   EDIT DATA
                 </button>
-                <button 
+                <button
                   onClick={() => setShowBoostModal(true)}
-                  className="flex items-center justify-center gap-2 py-4 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black transition-all text-xs shadow-lg shadow-emerald-500/20 group"
+                  className="flex items-center justify-center gap-2 py-4 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black transition-all text-[10px] shadow-lg shadow-emerald-500/20 group"
                 >
                   TINGKATKAN KETERAMPILAN
                   <Sparkles size={16} className="fill-current group-hover:rotate-12 transition-transform" />
@@ -243,7 +244,7 @@ const MySkillCard: React.FC<MySkillCardProps> = ({ onGoalCreated }) => {
       {showBoostModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-2xl">
-            <BoostMySkill 
+            <BoostMySkill
               onClose={() => setShowBoostModal(false)}
               skillData={skillData}
               goalId={selectedGoalId}

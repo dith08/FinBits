@@ -23,7 +23,7 @@ export const Tabungan: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [alertError, setAlertError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  
+
   const [currentGoal, setCurrentGoal] = useState<SavingGoal | null>(null);
 
   const fetchSavingData = async () => {
@@ -31,7 +31,7 @@ export const Tabungan: React.FC = () => {
       setLoading(true);
       setError(null);
       const response = await savingService.getAll();
-      
+
       const transformedData: SavingGoal[] = (response.data || []).map((item: Record<string, unknown>) => ({
         id: item.saving_id,
         goalName: item.goal_name,
@@ -40,7 +40,7 @@ export const Tabungan: React.FC = () => {
         targetDate: item.target_date,
         isActive: item.is_active,
       }));
-      
+
       if (transformedData.length > 0) {
         setCurrentGoal(transformedData[0]);
       }
@@ -139,7 +139,7 @@ export const Tabungan: React.FC = () => {
   return (
     <div className="relative group overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900 p-1 rounded-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,184,148,0.1)]">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00b894] to-[#00cec9] opacity-10 group-hover:opacity-25 transition duration-500 blur-xl"></div>
-      
+
       <div className="relative bg-[#0d0d0d] p-6 rounded-[calc(1rem-1px)] h-full">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -148,9 +148,19 @@ export const Tabungan: React.FC = () => {
             </h2>
             <p className="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase">Bermimpi Besar, Menabung Kecil</p>
           </div>
-          <div className="flex flex-col items-end">
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${currentGoal ? 'bg-[#00b894]/20 text-[#00b894]' : 'bg-gray-800 text-gray-500'}`}>
-              {currentGoal ? 'Target Aktif' : 'Tidak Ada Target'}
+          <div className="flex flex-col items-end shrink-0">
+            <span className={`px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider leading-none border ${currentGoal
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : 'bg-gray-800 text-gray-500 border-gray-700'
+              }`}>
+              {currentGoal ? (
+                <span className="flex items-center gap-1">
+                  <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse" />
+                  Target Aktif
+                </span>
+              ) : (
+                'Tidak Ada Target'
+              )}
             </span>
           </div>
         </div>
@@ -165,12 +175,12 @@ export const Tabungan: React.FC = () => {
         {!currentGoal ? (
           <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-gray-800 rounded-2xl">
             <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mb-4 text-gray-700">
-               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-               </svg>
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
             </div>
             <p className="text-gray-500 text-sm mb-6 italic text-center px-6">"Tabungan adalah langkah pertama menuju kebebasan finansial."</p>
-            <button 
+            <button
               onClick={() => setShowAddGoalModal(true)}
               className="py-3 px-8 bg-white text-black hover:bg-[#00b894] hover:text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-xl active:scale-95"
             >
@@ -191,9 +201,9 @@ export const Tabungan: React.FC = () => {
                   </span>
                 </div>
               </div>
-              
+
               <div className="h-4 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-800 p-[2px]">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-[#00b894] to-[#00cec9] rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(0,184,148,0.4)]"
                   style={{ width: `${progress}%` }}
                 >
@@ -204,31 +214,31 @@ export const Tabungan: React.FC = () => {
 
             <div className="grid grid-cols-1 gap-4 mb-8">
               <div className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex justify-between items-center group/card hover:bg-white/[0.06] transition-colors">
-                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Target</span>
-                 <span className="text-sm font-bold text-gray-200">{formatIDR(currentGoal.targetAmount)}</span>
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Target</span>
+                <span className="text-sm font-bold text-gray-200">{formatIDR(currentGoal.targetAmount)}</span>
               </div>
-              
+
               <div className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex justify-between items-center group/card hover:bg-white/[0.06] transition-colors">
-                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Saat Ini</span>
-                 <span className="text-sm font-bold text-[#00b894]">{formatIDR(currentGoal.currentAmount)}</span>
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Saat Ini</span>
+                <span className="text-sm font-bold text-[#00b894]">{formatIDR(currentGoal.currentAmount)}</span>
               </div>
 
               <div className="bg-[#00b894]/5 border border-[#00b894]/10 p-4 rounded-2xl flex justify-between items-center">
-                 <span className="text-[10px] text-[#00b894] font-bold uppercase tracking-widest leading-none">Sisa</span>
-                 <span className="text-sm font-black text-white">
-                   {formatIDR(Math.max(0, currentGoal.targetAmount - currentGoal.currentAmount))}
-                 </span>
+                <span className="text-[10px] text-[#00b894] font-bold uppercase tracking-widest leading-none">Sisa</span>
+                <span className="text-sm font-black text-white">
+                  {formatIDR(Math.max(0, currentGoal.targetAmount - currentGoal.currentAmount))}
+                </span>
               </div>
             </div>
 
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={() => setShowAddModal(true)}
-                className="flex-[2] py-4 bg-[#00b894] hover:bg-[#00cec9] text-black font-black text-xs uppercase tracking-[0.15em] rounded-2xl transition-all shadow-lg active:scale-95"
+                className="flex-[2] py-4 bg-[#00b894] hover:bg-[#00cec9] text-white font-black text-xs uppercase tracking-[0.15em] rounded-2xl transition-all shadow-lg active:scale-95"
               >
                 Top Up
               </button>
-              <button 
+              <button
                 onClick={() => setShowDetailModal(true)}
                 className="flex-1 py-4 bg-transparent border border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest rounded-2xl transition-all"
               >
@@ -240,21 +250,21 @@ export const Tabungan: React.FC = () => {
       </div>
 
       {showAddModal && (
-        <AddSavings 
+        <AddSavings
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddTabungan}
         />
       )}
 
       {showAddGoalModal && (
-        <AddSavingsGoal 
+        <AddSavingsGoal
           onClose={() => setShowAddGoalModal(false)}
           onAdd={handleAddGoal}
         />
       )}
 
       {showDetailModal && currentGoal && (
-        <DetailSavings 
+        <DetailSavings
           onClose={() => setShowDetailModal(false)}
           currentSaving={currentGoal.currentAmount}
           targetSaving={currentGoal.targetAmount}

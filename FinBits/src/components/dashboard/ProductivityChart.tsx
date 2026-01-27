@@ -213,7 +213,7 @@ const ProductivityChart = () => {
     <div className="bg-[#09090b] p-6 rounded-3xl border border-zinc-800 w-full h-full flex flex-col hover:border-zinc-700 transition-colors duration-300 relative overflow-hidden">
       <div className="flex justify-between items-center mb-6 z-10">
         <div>
-          <h2 className="text-white font-bold text-lg flex items-center gap-2">
+          <h2 className="text-white font-bold text-sm md:text-lg flex items-center gap-2">
             <Activity size={18} className="text-indigo-500" />
             Analitik Performa
           </h2>

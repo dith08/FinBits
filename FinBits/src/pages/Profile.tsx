@@ -79,12 +79,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className={`min-h-screen bg-black text-white p-6 md:p-12 font-sans pt-20 lg:pt-6 transition-all ${hasError ? 'grayscale' : ''}`}>
+    <div className={`min-h-screen bg-black text-white p-3 sm:p-6 md:p-12 font-sans pt-16 sm:pt-20 lg:pt-6 transition-all ${hasError ? 'grayscale' : ''}`}>
       
-      <div className="max-w-6xl mx-auto space-y-10">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-10">
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-2 sm:p-3 text-red-400 text-xs sm:text-sm">
             {error}
             <button onClick={fetchProfile} className="ml-2 underline">Coba lagi</button>
           </div>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
           onUpdate={handleUpdateProfile}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           
           <NoteCard 
             note={profile?.note}
@@ -117,7 +117,7 @@ export default function ProfilePage() {
             onUpdate={handleUpdateProfile}
           />
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 sm:gap-6">
             <StreakCard />
             <TopHabbitsCard />
           </div>
@@ -125,7 +125,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="pb-20"></div>
+      <div className="pb-16 sm:pb-20"></div>
 
       <AlertModal
         isOpen={alert.isOpen}

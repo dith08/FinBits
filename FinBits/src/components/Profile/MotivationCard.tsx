@@ -24,13 +24,11 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
 
   return (
     <div className="group relative w-full max-w-md overflow-hidden">
-      {/* Background Gradient Animated Flare */}
       <div className="absolute -top-24 -left-24 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl group-hover:bg-purple-600/30 transition-all duration-700"></div>
       <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl group-hover:bg-blue-600/30 transition-all duration-700"></div>
 
       <div className="relative bg-zinc-950/40 backdrop-blur-md rounded-3xl p-8 min-h-[400px] border border-white/10 flex flex-col items-center justify-center shadow-2xl">
         
-        {/* Floating Controls */}
         {onUpdate && (
           <div className="absolute top-6 right-6 flex gap-3 z-10">
             {isEditing ? (
@@ -59,12 +57,10 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
           </div>
         )}
 
-        {/* Decorative Quote Icon */}
         <div className="mb-6 opacity-20">
           <Quote size={40} className="text-purple-400 fill-purple-400" />
         </div>
 
-        {/* Title with Icon */}
         <div className="flex items-center gap-2 mb-8">
           <Sparkles size={18} className="text-yellow-500 animate-pulse" />
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-500">Semangat Harian</h2>
@@ -77,7 +73,7 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
               value={editMotivation}
               onChange={(e) => setEditMotivation(e.target.value)}
               className="w-full flex-1 bg-white/5 text-zinc-100 rounded-2xl p-5 text-center text-lg italic border border-white/10 focus:border-purple-500/50 outline-none resize-none transition-all"
-              placeholder="Apa kata-kata sakti lu hari ini?"
+              placeholder="Tuliskan motivasi sakti kamu hari ini?"
             />
           </div>
         ) : (
@@ -92,7 +88,6 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
           </div>
         )}
 
-        {/* Bottom Accent */}
         <div className="mt-8 w-12 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full opacity-50"></div>
       </div>
     </div>

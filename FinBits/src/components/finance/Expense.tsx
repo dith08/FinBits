@@ -50,7 +50,7 @@ export const ExpenseCard: React.FC = () => {
   return (
     <div className="relative group overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900 p-1 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-red-400 opacity-10 group-hover:opacity-30 transition duration-500 blur-md"></div>
-      
+
       <div className="relative bg-[#0d0d0d] p-6 rounded-[calc(1rem-1px)] h-full">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -93,23 +93,26 @@ export const ExpenseCard: React.FC = () => {
           )}
         </div>
 
-        <div className="bg-gray-800/30 p-4 rounded-xl mb-6">
-          <div className="flex justify-between items-end">
-            <span className="text-xs text-gray-400 uppercase font-bold tracking-widest">Total Pengeluaran</span>
-            <span className="text-sm md:text-2xl font-black text-white leading-none">
-              Rp. {total.toLocaleString('id-ID')}
+        <div className="bg-gray-800/30 p-4 rounded-xl mb-6 border border-gray-700/50">
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-[10px] sm:text-xs text-gray-400 uppercase font-bold tracking-widest shrink-0">
+              Total Pengeluaran
+            </span>
+
+            <span className="text-sm sm:text-lg md:text-2xl font-black text-white leading-none text-right break-all">
+              Rp {total.toLocaleString('id-ID')}
             </span>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <button 
+          <button
             onClick={() => setShowAddModal(true)}
-            className={`py-3 px-4 ${COLOR_CLASSES.danger.bg} hover:bg-red-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-red-500/20 active:scale-95 transition-all`}
+            className={`py-3 px-4 ${COLOR_CLASSES.danger.bg} hover:bg-red-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-red-500/20 active:scale-95 transition-all`}
           >
             Tambah Baru
           </button>
-          <button 
+          <button
             onClick={() => setShowDetailModal(true)}
             className="py-3 px-4 bg-transparent border border-gray-700 hover:border-gray-500 text-gray-300 rounded-xl text-xs font-bold uppercase tracking-widest active:scale-95 transition-all"
           >

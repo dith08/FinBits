@@ -132,7 +132,7 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goalData, onUpdate, onDelete }) =
           
           <button 
             onClick={handleEditClick}
-            className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 transition-all text-xs font-bold flex items-center justify-center gap-2"
+            className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white transition-all text-xs font-bold flex items-center justify-center gap-2"
           >
             <span>Edit</span>
             <ArrowRight size={16} />
