@@ -21,14 +21,14 @@ const GoalsStatCard = () => {
   if (loading) return <CardSkeleton />;
 
   return (
-    <div className={`relative w-full h-full overflow-hidden group rounded-2xl md:rounded-3xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-xl p-4 md:p-6 transition-all duration-300 ${COLOR_CLASSES.secondary.hover} ${COLOR_CLASSES.secondary.glow}`}>
+    <div className={`relative w-full h-full overflow-hidden group rounded-2xl md:rounded-3xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-xl p-4 md:p-6 transition-all duration-300 ${COLOR_CLASSES.primary.hover} ${COLOR_CLASSES.primary.glow}`}>
       <Target 
-        className="absolute -bottom-4 -right-4 text-blue-500/5 group-hover:text-blue-500/10 transition-all duration-500 transform group-hover:scale-110 rotate-12 w-20 h-20 md:w-32 md:h-32" 
+        className="absolute -bottom-4 -right-4 text-emerald-500/5 group-hover:text-emerald-500/10 transition-all duration-500 transform group-hover:scale-110 rotate-12 w-20 h-20 md:w-32 md:h-32" 
         strokeWidth={1}
       />
       
       <div className="relative z-10 flex flex-col h-full justify-between min-h-[140px]">
-        <div className={`p-2 md:p-3 w-fit rounded-xl md:rounded-2xl bg-zinc-800/50 border border-zinc-700/50 ${COLOR_CLASSES.secondary.text}`}>
+        <div className={`p-2 md:p-3 w-fit rounded-xl md:rounded-2xl bg-zinc-800/50 border border-zinc-700/50 ${COLOR_CLASSES.primary.text}`}>
           <Target className="w-5 h-5 md:w-6 md:h-6" />
         </div>
 

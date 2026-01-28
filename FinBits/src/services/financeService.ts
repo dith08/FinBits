@@ -145,6 +145,10 @@ export const wantsService = {
     
     if (data.item_image && data.item_image instanceof File) {
       formData.append('item_image', data.item_image);
+    } else {
+      // Jika tidak ada file, append empty file atau skip
+      // Beberapa API memerlukan field ini meski kosong
+      formData.append('item_image', new File([], 'empty.txt'));
     }
     
     const response = await apiInstance.post('/finance/wants/add', formData, {

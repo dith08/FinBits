@@ -50,7 +50,7 @@ const HabitCard = () => {
           
           <div className="w-full h-1.5 bg-zinc-800 rounded-full mt-2 md:mt-3 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-cyan-600 to-blue-500 rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${displayValue}%` }}
             />
           </div>

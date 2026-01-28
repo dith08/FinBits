@@ -241,8 +241,8 @@ const ProductivityChart = () => {
                 <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="colorFinance" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="colorGoals" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
@@ -283,7 +283,7 @@ const ProductivityChart = () => {
               name="Keuangan"
               type="monotone" 
               dataKey="financeBalance" 
-              stroke="#3b82f6" 
+              stroke="#10b981" 
               strokeWidth={2}
               fill="url(#colorFinance)"
               activeDot={{ r: 6, strokeWidth: 0, fill: '#fff' }}

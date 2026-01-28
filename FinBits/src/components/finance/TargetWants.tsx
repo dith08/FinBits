@@ -140,7 +140,7 @@ export const TargetWants: React.FC = () => {
       await wantsService.add({
         item_name: name,
         price: Number(price),
-        budget_set: 0,
+        budget_set: 0.01,
         item_image: imageFile
       });
 
@@ -148,13 +148,23 @@ export const TargetWants: React.FC = () => {
       setShowAddWants(false);
     } catch (err: unknown) {
       let message = 'Gagal menambah wants';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as Record<string, unknown>).response;
-        if (response && typeof response === 'object' && 'data' in response) {
-          const data = (response as Record<string, unknown>).data;
-          if (data && typeof data === 'object' && 'message' in data) {
-            message = (data as Record<string, unknown>).message as string;
+      console.error('Full error object:', err);
+      
+      if (err && typeof err === 'object') {
+        if ('response' in err) {
+          const response = (err as Record<string, unknown>).response;
+          if (response && typeof response === 'object') {
+            console.error('Response data:', (response as Record<string, unknown>).data);
+            if ('data' in response) {
+              const data = (response as Record<string, unknown>).data;
+              if (data && typeof data === 'object' && 'message' in data) {
+                message = (data as Record<string, unknown>).message as string;
+              }
+            }
           }
+        }
+        if ('message' in err) {
+          message = (err as Record<string, unknown>).message as string;
         }
       }
       console.error('Error adding want:', err);
